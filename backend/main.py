@@ -10,7 +10,7 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from backend.prompt_importer import load_sys_prompt
+from prompt_importer import load_sys_prompt
 from ocr import extract_text
 from ollama import ask_ollama, check_ollama_health, parse_llm_json
 from sessions import (
