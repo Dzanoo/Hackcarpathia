@@ -22,7 +22,7 @@ FORMAT ODPOWIEDZI:
       "explanation": "dlaczego to jest problem dla Ciebie jako podpisującego",
       "level": "niskie|srednie|wysokie|nielegalne",
       "legal_basis": "np. Art. 87 KP lub null",
-      "recommendation": "co powinieneś zrobić lub wynegocjować"
+      "recommendation": "prostym językiem co powinien zrobić lub wynegocjować podpisujący umowę"
     }
   ],
   "overall_risk": "niskie|srednie|wysokie|nielegalne"

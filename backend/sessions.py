@@ -86,7 +86,7 @@ def get_history_all() -> list:
             "SELECT role, content FROM messages WHERE role = 'assistant' ORDER BY id",
         ).fetchall()
     messages = [{"role": r["role"], "content": r["content"]} for r in rows]
-    return [{"role": "system", "content": SYSTEM_PROMPT}] + messages
+    return json.loads[{"role": "system", "content": SYSTEM_PROMPT}] + messages
 
 def get_public_history(session_id: str) -> list:
     """Returns history without system prompt — for the user."""
