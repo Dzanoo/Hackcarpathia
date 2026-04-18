@@ -39,7 +39,7 @@ export default function TranslatorPage() {
     };
   }, [file]);
 
-  const onSubmit = async (e: React.FormEvent) => {
+  const onSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     if (!message.trim() && !file) return;
 
