@@ -21,6 +21,8 @@ from sessions import (
     get_public_history,
     init_db,
     session_exists,
+    get_db_new_id,
+    get_history_all,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -118,12 +120,11 @@ async def analyze_document(
     result = parse_llm_json(raw_response)
 
     append_message(session_id, "assistant", raw_response)
-
+    new_id = get_db_new_id()
     return {
-        "session_id": session_id,
-        "result": result,
-        "extracted_text_length": len(text),
+        "id": new_id
     }
+
 
 @app.post("/chat")
 async def chat(req: ChatRequest):
@@ -156,6 +157,10 @@ async def history(session_id: str):
         raise HTTPException(404, "Sesja nie istnieje")
     return {"session_id": session_id, "messages": get_public_history(session_id)}
 
+@app.get("/history")
+async def history():
+    """Zwraca historię wiadomości sesji (bez system promptu)."""
+    return {"history": get_history_all()}
 
 @app.delete("/session/{session_id}")
 async def remove_session(session_id: str):

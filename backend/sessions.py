@@ -52,6 +52,14 @@ def session_exists(session_id: str) -> bool:
         ).fetchone()
     return row is not None
 
+def get_db_new_id() -> int:
+    """Returns the internal DB ID for a session, or None if not found."""
+    with _get_conn() as conn:
+        row = conn.execute(
+            "SELECT rowid FROM sessions ORDER BY rowid DESC LIMIT 1"
+        ).fetchone()
+    return row["rowid"] if row else None
+
 
 def get_history(session_id: str) -> list:
     """Returns full history with system prompt prepended in memory — not stored in DB."""
@@ -63,6 +71,15 @@ def get_history(session_id: str) -> list:
     messages = [{"role": r["role"], "content": r["content"]} for r in rows]
     return [{"role": "system", "content": SYSTEM_PROMPT}] + messages
 
+
+def get_history_all() -> list:
+    """Returns full history with system prompt prepended in memory — not stored in DB."""
+    with _get_conn() as conn:
+        rows = conn.execute(
+            "SELECT role, content FROM messages WHERE role = 'assistant' ORDER BY id",2
+        ).fetchall()
+    messages = [{"role": r["role"], "content": r["content"]} for r in rows]
+    return [{"role": "system", "content": SYSTEM_PROMPT}] + messages
 
 def get_public_history(session_id: str) -> list:
     """Returns history without system prompt — for the user."""
