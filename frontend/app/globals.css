@@ -112,11 +112,12 @@ body {
 .service-button {
   display: flex;
   align-items: center;
-  width: 100%; /* Pełna szerokość na mobile */
+  width: 98%;
+  margin: auto;
   gap: 12px;
   padding: 0.85rem 1rem;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-top: 1px solid #48494d;
   background-color: transparent;
   color: var(--service-text);
   cursor: pointer;
