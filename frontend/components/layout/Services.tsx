@@ -6,10 +6,13 @@ export default function Services() {
   return (
     <div id="services" className="">
       <h1 className="text-lg font-bold text-gray-800 dark:text-gray-200">mPrzyszłość</h1>
+
+      {/* GŁÓWNE NARZĘDZIA AI */}
       <div className="servicesGroup">
-        <ServiceButton icon={<LayoutDashboard size={20} />} label="Dashboard" href="/crm/dashboard" />
-        <ServiceButton icon={<Users size={20} />} label="Clients" href="/crm/clients" />
-        <ServiceButton icon={<ShoppingCart size={20} />} label="Orders" href="/crm/orders" />
+        <p>Analiza AI</p>
+        <ServiceButton icon={<FileSearch size={20} />} label="Tłumacz Pism" href="/analyze/translator" />
+        <ServiceButton icon={<Scale size={20} />} label="Weryfikacja Umów" href="/analyze/contracts" />
+        <ServiceButton icon={<History size={20} />} label="Historia Analiz" href="/analyze/history" />
       </div>
 
       {/* MODUŁY EDUKACYJNO-FINANSOWE */}
