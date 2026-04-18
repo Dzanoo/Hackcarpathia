@@ -28,7 +28,7 @@
   :root {
     --text: #ffffff;
     --bg: #252525;
-    --services-bg: #22252a;
+    --services-bg: #252525;
     --services-group-bg: #313237;
     --services-border: #2a2a2a;
     --service-text: #e0e0e0;
@@ -159,7 +159,6 @@ body {
 @media (max-width: 768px) {
   #services {
     border-right: none;
-    border-bottom: 1px solid var(--services-border);
     min-height: auto;
     width: 100%;
     padding-bottom: 1.1rem;
