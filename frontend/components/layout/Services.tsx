@@ -6,11 +6,6 @@ export default function Services() {
   return (
     <div id="services" className="">
       <h1 className="text-lg font-bold text-gray-800 dark:text-gray-200">mPrzyszłość</h1>
-      <div className="servicesGroup">
-        <ServiceButton icon={<LayoutDashboard size={20} />} label="Dashboard" href="/crm/dashboard" />
-        <ServiceButton icon={<Users size={20} />} label="Clients" href="/crm/clients" />
-        <ServiceButton icon={<ShoppingCart size={20} />} label="Orders" href="/crm/orders" />
-      </div>
 
       {/* MODUŁY EDUKACYJNO-FINANSOWE */}
       <div className="servicesGroup">
