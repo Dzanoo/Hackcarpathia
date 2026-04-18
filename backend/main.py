@@ -102,8 +102,7 @@ async def get_session(session_id: str):
 @app.post("/analyze")
 async def analyze_document(
     session_id: str = Form(...),
-    file: UploadFile = File(...),
-    message: str = Form(...),
+    file: UploadFile = File(...),  # now required, no Optional
 ):
     if not session_exists(session_id):
         raise HTTPException(404, f"Sesja '{session_id}' nie istnieje. Utwórz przez POST /session/new")
@@ -113,32 +112,9 @@ async def analyze_document(
         raise HTTPException(400, "Plik za duży (max 10 MB)")
 
     text = extract_text(file.filename, file_bytes)
+    user_content = "Plik do analizy:\r\n" + text
 
-    return raw_query(
-        session_id,
-        "User Message:" + message + "\r\n\r\nDocument to analyze:\r\n" + text
-    )
-
-
-@app.post("/query")
-async def query(
-    session_id: str = Form(...),
-    message: str = Form(...),
-) -> dict[str, int | None]:
-    return await raw_query(
-        session_id,
-        message
-    )
-
-
-async def raw_query(
-    session_id: str,
-    message: str,
-) -> dict[str, int | None]:
-    if not session_exists(session_id):
-        raise HTTPException(404, f"Sesja '{session_id}' nie istnieje. Utwórz przez POST /session/new")
-
-    append_message(session_id, "user", message)
+    append_message(session_id, "user", user_content)
     history = get_history(session_id)
 
     raw_response = await ask_ollama(history)
@@ -149,7 +125,6 @@ async def raw_query(
     return {
         "id": new_id
     }
-
 
 @app.post("/chat")
 async def chat(req: ChatRequest):
