@@ -27,7 +27,12 @@ async def ask_ollama(messages: list) -> str:
                 "messages": messages,
                 "stream": False,
                 "format": "json",
-                "options": {"temperature": 0.1, "num_ctx": 8192},
+                "options": {
+                    "temperature": 0.1, # near-deterministic — you want consistent structured output, not creativity
+                    #"num_predict": 1000, # enough for the JSON structure, prevents rambling
+                    "num_ctx": 4096,    # explicit per-request context (matches your server setting)
+                    "repeat_penalty": 1.1,  # discourages the model from repeating itself in long outputs
+                },
             })
             resp.raise_for_status()
             return resp.json()["message"]["content"]
