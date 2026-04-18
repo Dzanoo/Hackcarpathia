@@ -61,8 +61,19 @@ function riskIcon(level: RiskLevel) {
   }
 }
 
+const documentTypeLabels: Record<string, string> = {
+  umowa_o_prace: "Umowa o pracę",
+  umowa_zlecenie: "Umowa zlecenia",
+  umowa_o_dzielo: "Umowa o dzieło",
+  pismo_zus: "Pismo ZUS",
+  pismo_us: "Pismo US",
+  umowa_najmu: "Umowa najmu",
+  inne: "Inne",
+};
+
 function formatLabel(str: string) {
-  return str && str.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  if (!str) return "";
+  return documentTypeLabels[str] ?? str.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export default function ResponsePage() {
