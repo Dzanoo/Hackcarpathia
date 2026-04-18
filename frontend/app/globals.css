@@ -13,7 +13,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --services-bg: rgba(31, 41, 55, var(--tw-bg-opacity));
+    --services-bg: #252525;
     --services-border: #2a2a2a;
     --service-text: #e0e0e0;
     --service-text-secondary: #808080;
@@ -109,6 +109,8 @@ body {
   #services {
     border-right: none;
     border-bottom: 1px solid var(--services-border);
+    min-height: auto;
+    width: 100%;
   }
 
   .service-button {
