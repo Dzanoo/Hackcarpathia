@@ -30,5 +30,3 @@ FORMAT ODPOWIEDZI (JSON):
   "overall_risk": "niskie|srednie|wysokie|nielegalne"
 }
 ```
-
-Bądź dogłebny, sczegółowy i profesjonalny podczas analizy, jednak przy wyjaśnianiu urzytkownikowi bądź przyjazny i wyluzowany
