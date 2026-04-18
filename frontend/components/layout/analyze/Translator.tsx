@@ -63,7 +63,7 @@ export default function TranslatorPage() {
             <div className="button-row">
               <div className="button-container">
                 <button type="button" className="icon-button" onClick={() => fileInputRef.current?.click()} aria-label="Z urządzenia">
-                  <FileSpreadsheet size={18} />
+                  <FileSpreadsheet size={18} color="blue" />
                 </button>
                 <h2>Z urządzenia</h2>
                 <p>PDF, DOCX, TXT...</p>

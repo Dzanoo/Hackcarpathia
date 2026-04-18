@@ -277,7 +277,7 @@ body {
   height: 44px;
   border: 1px solid var(--llm-border);
   border-radius: 14px;
-  background: var(--llm-surface);
+  background: #1a1f36;
   color: var(--text);
   display: inline-flex;
   align-items: center;
