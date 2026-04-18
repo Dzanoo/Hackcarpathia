@@ -114,16 +114,27 @@ async def analyze_document(
 
     text = extract_text(file.filename, file_bytes)
 
-    return query(
+    return raw_query(
         session_id,
         "User Message:" + message + "\r\n\r\nDocument to analyze:\r\n" + text
     )
+
 
 @app.post("/query")
 async def query(
     session_id: str = Form(...),
     message: str = Form(...),
-):
+) -> dict[str, int | None]:
+    return await raw_query(
+        session_id,
+        message
+    )
+
+
+async def raw_query(
+    session_id: str,
+    message: str,
+) -> dict[str, int | None]:
     if not session_exists(session_id):
         raise HTTPException(404, f"Sesja '{session_id}' nie istnieje. Utwórz przez POST /session/new")
 
