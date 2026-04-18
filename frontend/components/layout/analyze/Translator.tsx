@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Loader from "@/components/animations/loading";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FileText, Paperclip, Send, X, FileSpreadsheet, Camera } from "lucide-react";
 import ServiceScreen from "@/components/menus/ServiceScreen";
@@ -11,10 +12,17 @@ export default function TranslatorPage() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const router = useRouter();
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!file || !file.type.startsWith("image/")) {
       setPreviewUrl(null);
+      (async () => {
+        const res = await fetch("http://172.16.16.13:8000/session/new");
+        const data = await res.json();
+        setSessionId(data.session_id);
+      })();
       return;
     }
 
@@ -38,9 +46,11 @@ export default function TranslatorPage() {
     if (message === "mock") router.push("/response/mock");
 
     const formData = new FormData();
+    formData.append("session_id", sessionId ?? "");
     formData.append("message", message);
     if (file) formData.append("file", file);
-
+    console.log(formData);
+    setLoading(true);
     const res = await fetch("http://172.16.16.13:8000/analyze", {
       method: "POST",
       body: formData,
@@ -49,6 +59,14 @@ export default function TranslatorPage() {
     const data = await res.json();
     router.push(`/response/${data.id}`);
   };
+
+  if (loading) {
+    return (
+      <div className="response-loading">
+        <Loader />
+      </div>
+    );
+  }
 
   return (
     <ServiceScreen eyebrow="Analiza AI" title="Analizuj dokument" description="Załącz dokument i opisz co chciałbyś się dowiedzieć.">

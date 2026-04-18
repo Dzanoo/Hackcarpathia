@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import Loader from "@/components/animations/loading";
 import { Clock3, FileText, Search } from "lucide-react";
 import ServiceScreen from "@/components/menus/ServiceScreen";
 
@@ -12,10 +13,31 @@ const mockHistory = [
 
 export default function HistoryPage() {
   const [query, setQuery] = useState("");
+  const [history, setHistory] = useState(mockHistory);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("http://172.16.16.13:8000/history");
+      const data = await res.json();
+      console.log(data);
+      setHistory(data.history);
+      setLoading(false);
+    })();
+    return;
+  }, []);
 
   const filtered = useMemo(() => {
-    return mockHistory.filter((item) => item.title.toLowerCase().includes(query.toLowerCase()));
+    return history.filter((item) => item.title.toLowerCase().includes(query.toLowerCase()));
   }, [query]);
+
+  if (loading) {
+    return (
+      <div className="response-loading">
+        <Loader />
+      </div>
+    );
+  }
 
   return (
     <ServiceScreen eyebrow="Analiza AI" title="Historia analiz" description="Przegląd ostatnich dokumentów i wyników.">
