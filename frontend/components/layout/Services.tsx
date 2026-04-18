@@ -4,9 +4,9 @@ import ServiceButton from "../menus/ServiceButton";
 
 export default function Services() {
   return (
-    <div id="services">
+    <div id="services" className="">
       <div className="servicesGroup">
-        <p>CRM</p>
+        <h1 className="text-lg font-bold text-gray-800 dark:text-gray-200">mPrzyszłość</h1>
         <ServiceButton icon={<LayoutDashboard size={20} />} label="Dashboard" href="/crm/dashboard" />
         <ServiceButton icon={<Users size={20} />} label="Clients" href="/crm/clients" />
         <ServiceButton icon={<ShoppingCart size={20} />} label="Orders" href="/crm/orders" />

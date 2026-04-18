@@ -13,7 +13,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --services-bg: #121212;
+    --services-bg: rgba(31, 41, 55, var(--tw-bg-opacity));
     --services-border: #2a2a2a;
     --service-text: #e0e0e0;
     --service-text-secondary: #808080;
