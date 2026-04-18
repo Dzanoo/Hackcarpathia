@@ -66,6 +66,7 @@ body {
 #services {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 1.25rem;
   padding: 1rem;
   background-color: var(--services-bg);
@@ -75,13 +76,14 @@ body {
 }
 
 #services h1 {
-  margin: 0 0 0.25rem 0.75rem;
-  font-size: 1.35rem;
+  margin: 0 0 0.25rem 1rem;
+  align-self: flex-start;
+  font-size: 1.5rem;
   line-height: 1.1;
 }
 
 #services p {
-  margin: 0 0 0.5rem 0.75rem;
+  margin: 0 0 0.5rem 1rem;
   font-size: 0.7rem;
   font-weight: 700;
   color: var(--text);
@@ -91,20 +93,18 @@ body {
 .servicesGroup {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  width: 100%;
   gap: 4px;
 }
-
-.servicesButtons {
-  background-color: var(--services-group-bg);
-  border-radius: 15px;
-  width: 85%;
-  margin: 0;
+.servicesGroup p {
+  align-self: flex-start;
 }
 
 .servicesButtons {
   background-color: var(--services-group-bg);
   border-radius: 15px;
-  width: 85%;
+  width: 100%;
   margin: 0;
 }
 
