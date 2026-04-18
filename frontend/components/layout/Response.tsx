@@ -63,7 +63,7 @@ function riskIcon(level: RiskLevel) {
 
 const documentTypeLabels: Record<string, string> = {
   umowa_o_prace: "Umowa o pracę",
-  umowa_zlecenie: "Umowa zlecenie",
+  umowa_zlecenie: "Umowa zlecenia",
   umowa_o_dzielo: "Umowa o dzieło",
   pismo_zus: "Pismo ZUS",
   pismo_us: "Pismo US",
