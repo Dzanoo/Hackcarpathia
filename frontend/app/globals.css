@@ -125,10 +125,6 @@ body {
   text-decoration: none;
 }
 
-.service-button:hover {
-  background-color: var(--service-hover);
-}
-
 .service-button:first-child {
   border-top: none;
 }
