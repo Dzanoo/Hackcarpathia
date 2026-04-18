@@ -2,8 +2,9 @@
 main.py — FastAPI endpoints
 Uruchom: uvicorn main:app --port 8000 --reload
 """
-
+import json
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
@@ -12,7 +13,6 @@ from pydantic import BaseModel
 
 from ocr import extract_text
 from ollama import ask_ollama, check_ollama_health, parse_llm_json
-from prompts import SYSTEM_PROMPT, document_user_message
 from sessions import (
     append_message,
     create_session,
@@ -29,12 +29,20 @@ from sessions import (
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+SYS_PROMPT_FILE = "system_prompt.txt"
+SYSTEM_PROMPT = ""
+if os.path.isfile("sys"):
+    with open(SYS_PROMPT_FILE, 'r') as f:
+        SYSTEM_PROMPT = f.read()
+else:
+    print("No system prompt found: " + SYS_PROMPT_FILE)
+    exit(1)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
     yield
-
 
 app = FastAPI(title="mPrzyszłość", version="1.0.0", lifespan=lifespan)
 app.add_middleware(
@@ -102,7 +110,8 @@ async def get_session(session_id: str):
 @app.post("/analyze")
 async def analyze_document(
     session_id: str = Form(...),
-    file: UploadFile = File(...),  # now required, no Optional
+    file: UploadFile = File(...),
+    message: str = Form(...),
 ):
     if not session_exists(session_id):
         raise HTTPException(404, f"Sesja '{session_id}' nie istnieje. Utwórz przez POST /session/new")
@@ -112,9 +121,21 @@ async def analyze_document(
         raise HTTPException(400, "Plik za duży (max 10 MB)")
 
     text = extract_text(file.filename, file_bytes)
-    user_content = document_user_message(text)
 
-    append_message(session_id, "user", user_content)
+    return query(
+        session_id,
+        "User Message:" + message + "\r\n\r\nDocument to analyze:\r\n" + text
+    )
+
+@app.post("/query")
+async def query(
+    session_id: str = Form(...),
+    message: str = Form(...),
+):
+    if not session_exists(session_id):
+        raise HTTPException(404, f"Sesja '{session_id}' nie istnieje. Utwórz przez POST /session/new")
+
+    append_message(session_id, "user", message)
     history = get_history(session_id)
 
     raw_response = await ask_ollama(history)
@@ -184,3 +205,15 @@ async def ocr_test(file: UploadFile = File(...)):
     file_bytes = await file.read()
     text = extract_text(file.filename, file_bytes)
     return {"text": text, "length": len(text)}
+
+
+@app.get("/prawa/{typ}")
+async def prawa(typ: str):
+    with open("data/prawa.json", 'r') as f:
+        text = f.read()
+
+        json_data = json.loads(text)
+        if json_data.has_key(typ):
+            return json_data[typ]
+        else:
+            raise HTTPException(404, "Nie ma takich praw")
