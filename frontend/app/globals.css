@@ -33,6 +33,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: var(--bg);
+  font-family: 'Roboto', sans-serif;
 }
 
 #services {
@@ -72,24 +73,20 @@ body {
 .service-button {
   display: flex;
   align-items: center;
-  width: 100%; /* Pełna szerokość na mobile */
+  width: 92%;
+  margin: auto;
   gap: 12px;
   padding: 0.75rem 1rem;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-top: 1px solid gray;
   background-color: transparent;
   color: var(--service-text);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.service-button:hover {
-  background-color: var(--service-hover);
-}
-
-.service-button.active {
-  background-color: var(--service-active);
-  color: var(--service-active-text);
+.service-button:first-child {
+  border-top: none;
 }
 
 /* Ikony */
