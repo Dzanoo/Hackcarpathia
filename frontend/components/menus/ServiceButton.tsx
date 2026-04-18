@@ -2,6 +2,7 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { ReactNode } from "react";
+import { ChevronRight } from "lucide-react";
 
 interface ServiceButtonProps {
   icon: ReactNode;
@@ -22,6 +23,10 @@ export default function ServiceButton({ icon, label, href, badge }: ServiceButto
       <span className="service-label">
         {label.replace("_", " ")} {/* Zamiana dashboard_analytics na Dashboard Analytics */}
       </span>
+
+      <div className="service-chevron">
+        <ChevronRight size={16} color="#9298b0" />
+      </div>
     </button>
   );
 }
