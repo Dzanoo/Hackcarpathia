@@ -44,7 +44,7 @@ export default function TranslatorPage() {
   };
 
   return (
-    <ServiceScreen eyebrow="Analiza AI" title="Tłumacz pism" description="Załącz dokument, opisz czego potrzebujesz i przygotuj wiadomość do LLM.">
+    <ServiceScreen eyebrow="Analiza AI" title="Tłumacz pism" description="Załącz dokument i opisz co chciałbyś się dowiedzieć.">
       <form className="service-form" onSubmit={onSubmit}>
         <section className="form-block">
           <div className="form-block-top">
