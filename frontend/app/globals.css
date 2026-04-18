@@ -74,6 +74,7 @@ body {
 }
 
 #services h1 {
+  color: var(--text);
   margin: 0 0 0.25rem 0.75rem;
   font-size: 1.35rem;
   line-height: 1.1;
