@@ -63,7 +63,7 @@ export default function TranslatorPage() {
   if (loading) {
     return (
       <div className="response-loading">
-        <Loader />
+        <Loader text="Analizowanie" />
       </div>
     );
   }

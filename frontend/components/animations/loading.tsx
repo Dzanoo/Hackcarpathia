@@ -1,11 +1,15 @@
 import React from "react";
 import styled from "styled-components";
 
-const Loader = () => {
+interface LoaderProps {
+  text?: string;
+}
+
+const Loader = ({ text = "Ładowanie..." }: LoaderProps) => {
   return (
     <div className="loading-overlay">
       <StyledWrapper>
-        <h1 className="loading-title">Analizowanie</h1>
+        <h1 className="loading-title">{text}</h1>
         <section className="dots-container">
           <div className="dot" />
           <div className="dot" />
