@@ -80,13 +80,23 @@ def get_history(session_id: str) -> list:
 
 
 def get_history_all() -> list:
-    """Returns full history with system prompt prepended in memory — not stored in DB."""
     with _get_conn() as conn:
         rows = conn.execute(
-            "SELECT role, content FROM messages WHERE role = 'assistant' ORDER BY id",
+            "SELECT role, content, created_at FROM messages WHERE role = 'assistant' ORDER BY id",
         ).fetchall()
-    messages = [{"role": r["role"], "content": r["content"]} for r in rows]
-    return [{"role": "system", "content": SYSTEM_PROMPT}] + messages
+    
+    result = []
+    for r in rows:
+        try:
+            content = json.loads(r["content"])
+        except (json.JSONDecodeError, TypeError):
+            content = r["content"]
+        result.append({
+            "role": r["role"],
+            "content": content,
+            "created_at": r["created_at"],
+        })
+    return result
 
 def get_public_history(session_id: str) -> list:
     """Returns history without system prompt — for the user."""
