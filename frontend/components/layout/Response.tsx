@@ -122,12 +122,7 @@ export default function ResponsePage() {
           <div className="response-kpis">
             <div className="response-kpi">
               <span>Poziom ryzyka</span>
-              <strong>{riskLabel(result.overall_risk)}</strong>
-            </div>
-
-            <div className="response-kpi">
-              <span>Długość tekstu</span>
-              <strong>{data.extracted_text_length} znaków</strong>
+              <strong>{riskLabel(result.overall_risk) || "Brak ryzyka"}</strong>
             </div>
           </div>
         </section>
