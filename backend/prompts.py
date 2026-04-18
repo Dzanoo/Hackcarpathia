@@ -13,7 +13,6 @@ ZASADY:
 
 FORMAT ODPOWIEDZI:
 {
-  "id": "numer od 1-100",
   "document_type": "umowa_o_prace|umowa_zlecenie|umowa_o_dzielo|pismo_zus|pismo_us|umowa_najmu|inne",
   "summary": "2-3 zdania: czym jest dokument i co oznacza dla osoby podpisującej",
   "key_points": ["max 4 najważniejsze rzeczy dla podpisującego"],

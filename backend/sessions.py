@@ -1,43 +1,98 @@
 """
-sessions.py — przechowywanie i zarządzanie sesjami czatu w pamięci
+sessions.py — SQLite storage for chat sessions
 """
 
+import json
+import sqlite3
 import uuid
 from prompts import SYSTEM_PROMPT
 
-# Słownik sesji: { session_id: [ {role, content}, ... ] }
-_sessions: dict[str, list] = {}
+DB_PATH = "sessions.db"
+
+
+def _get_conn() -> sqlite3.Connection:
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db() -> None:
+    """Create tables if they don't exist. Call once on startup."""
+    with _get_conn() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS sessions (
+                session_id TEXT PRIMARY KEY,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT NOT NULL,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (session_id) REFERENCES sessions(session_id)
+            )
+        """)
 
 
 def create_session() -> str:
-    """Tworzy nową sesję z system promptem. Zwraca session_id."""
+    """Creates a new session with system prompt. Returns session_id."""
     session_id = str(uuid.uuid4())
-    _sessions[session_id] = [{"role": "system", "content": SYSTEM_PROMPT}]
+    with _get_conn() as conn:
+        conn.execute("INSERT INTO sessions (session_id) VALUES (?)", (session_id,))
+        conn.execute(
+            "INSERT INTO messages (session_id, role, content) VALUES (?, ?, ?)",
+            (session_id, "system", SYSTEM_PROMPT)
+        )
     return session_id
 
 
-def get_history(session_id: str) -> list | None:
-    """Zwraca historię wiadomości sesji lub None jeśli nie istnieje."""
-    return _sessions.get(session_id)
-
-
-def append_message(session_id: str, role: str, content: str) -> None:
-    """Dodaje wiadomość do historii sesji."""
-    _sessions[session_id].append({"role": role, "content": content})
-
-
-def delete_session(session_id: str) -> bool:
-    """Usuwa sesję. Zwraca True jeśli istniała."""
-    if session_id in _sessions:
-        del _sessions[session_id]
-        return True
-    return False
-
-
 def session_exists(session_id: str) -> bool:
-    return session_id in _sessions
+    with _get_conn() as conn:
+        row = conn.execute(
+            "SELECT 1 FROM sessions WHERE session_id = ?", (session_id,)
+        ).fetchone()
+    return row is not None
+
+
+def get_history(session_id: str) -> list:
+    """Returns full message history including system prompt."""
+    with _get_conn() as conn:
+        rows = conn.execute(
+            "SELECT role, content FROM messages WHERE session_id = ? ORDER BY id",
+            (session_id,)
+        ).fetchall()
+    return [{"role": r["role"], "content": r["content"]} for r in rows]
 
 
 def get_public_history(session_id: str) -> list:
-    """Historia bez system promptu — do zwrócenia użytkownikowi."""
-    return _sessions[session_id][1:]
+    """Returns history without system prompt — for the user."""
+    with _get_conn() as conn:
+        rows = conn.execute(
+            "SELECT role, content, created_at FROM messages WHERE session_id = ? AND role != 'system' ORDER BY id",
+            (session_id,)
+        ).fetchall()
+    return [{"role": r["role"], "content": r["content"], "created_at": r["created_at"]} for r in rows]
+
+
+def append_message(session_id: str, role: str, content: str) -> None:
+    """Appends a message to the session."""
+    with _get_conn() as conn:
+        conn.execute(
+            "INSERT INTO messages (session_id, role, content) VALUES (?, ?, ?)",
+            (session_id, role, content)
+        )
+
+
+def delete_session(session_id: str) -> bool:
+    """Deletes session and all its messages. Returns True if it existed."""
+    with _get_conn() as conn:
+        cursor = conn.execute(
+            "DELETE FROM sessions WHERE session_id = ?", (session_id,)
+        )
+        conn.execute(
+            "DELETE FROM messages WHERE session_id = ?", (session_id,)
+        )
+    return cursor.rowcount > 0

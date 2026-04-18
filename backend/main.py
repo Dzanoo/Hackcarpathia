@@ -4,9 +4,9 @@ Uruchom: uvicorn main:app --port 8000 --reload
 """
 
 import logging
-from typing import Optional
+from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -19,19 +19,25 @@ from sessions import (
     delete_session,
     get_history,
     get_public_history,
+    init_db,
     session_exists,
 )
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="mPrzyszłość", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+
+app = FastAPI(title="mPrzyszłość", version="1.0.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
 )
 
-
-# ── Modele requestów ───────────────────────────────────────────────────────────
 
 class ChatRequest(BaseModel):
     session_id: str
@@ -39,6 +45,10 @@ class ChatRequest(BaseModel):
 
 
 # ── Endpoints ──────────────────────────────────────────────────────────────────
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
 
 @app.get("/")
 async def root():
@@ -50,7 +60,7 @@ async def root():
             "POST /chat":                     "Pytanie follow-up w ramach sesji",
             "GET  /session/{id}/history":     "Historia rozmowy",
             "DELETE /session/{id}":           "Usuń sesję",
-            "GET  /health":                   "Status Ollamy",
+            "GET  /health":                   "Status Ollamy"
         }
     }
 
@@ -61,7 +71,6 @@ async def health():
     ollama = await check_ollama_health()
     return {"status": "ok" if ollama["status"] == "ok" else "degraded", "ollama": ollama}
 
-
 @app.post("/session/new")
 async def new_session():
     """Tworzy nową sesję czatu z pustą historią."""
@@ -69,53 +78,41 @@ async def new_session():
     logger.info(f"Nowa sesja: {session_id}")
     return {"session_id": session_id}
 
+@app.get("/session/get")
+async def get_session(session_id: str):
+    """Pobiera informacje o sesji."""
+    if not session_exists(session_id):
+        raise HTTPException(404, "Sesja nie istnieje")
+    return {"session_id": session_id}
 
 @app.post("/analyze")
 async def analyze_document(
-    file: UploadFile = File(..., description="Zdjęcie lub PDF dokumentu"),
-    session_id: Optional[str] = None,
+    session_id: str = Form(...),
+    file: UploadFile = File(...),  # now required, no Optional
 ):
-    """
-    Przyjmuje plik → OCR → LLM → JSON z analizą.
+    if not session_exists(session_id):
+        raise HTTPException(404, f"Sesja '{session_id}' nie istnieje. Utwórz przez POST /session/new")
 
-    Opcjonalnie podaj session_id żeby zapamiętać rozmowę.
-    Bez session_id analiza jest jednorazowa (bez historii).
-    """
     file_bytes = await file.read()
     if len(file_bytes) > 10 * 1024 * 1024:
         raise HTTPException(400, "Plik za duży (max 10 MB)")
 
-    # OCR
     text = extract_text(file.filename, file_bytes)
-
-    # Pobierz lub zbuduj historię
-    use_session = session_id and session_exists(session_id)
-    if use_session:
-        history = get_history(session_id)
-    else:
-        history = [{"role": "system", "content": SYSTEM_PROMPT}]
-        session_id = None
-
-    # Dodaj wiadomość użytkownika i wyślij do LLM
     user_content = document_user_message(text)
-    history.append({"role": "user", "content": user_content})
+
+    append_message(session_id, "user", user_content)
+    history = get_history(session_id)
 
     raw_response = await ask_ollama(history)
     result = parse_llm_json(raw_response)
 
-    # Zapisz odpowiedź do sesji
-    history.append({"role": "assistant", "content": raw_response})
-    if use_session:
-        append_message(session_id, "assistant", raw_response)
-    # Cofnij dodanie user message do sesji jeśli nie używamy sesji
-    # (history była lokalną kopią, nie referencją do _sessions)
+    append_message(session_id, "assistant", raw_response)
 
     return {
         "session_id": session_id,
         "result": result,
         "extracted_text_length": len(text),
     }
-
 
 @app.post("/chat")
 async def chat(req: ChatRequest):
