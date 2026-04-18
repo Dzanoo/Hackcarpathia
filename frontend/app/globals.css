@@ -644,10 +644,11 @@ textarea {
 }
 
 .category-card {
-  min-height: 88px;
-  padding: 14px;
+  min-height: 60px;
+  padding: 10px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
   gap: 10px;
   text-align: left;
   color: var(--text);
@@ -656,6 +657,82 @@ textarea {
 
 .category-card.soft {
   cursor: default;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background-color: transparent;
+  border: 1px solid var(--llm-border);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  background-color: var(--llm-surface);
+  border-color: var(--llm-primary);
+  color: var(--llm-primary);
+}
+
+.category-card.active {
+  background-color: var(--service-active);
+  color: var(--service-active-text);
+  border-radius: 8px;
+  border: 1px solid var(--llm-primary);
+}
+
+.category-data {
+  margin-top: 24px;
+  padding: 0;
+}
+
+.category-data h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.2rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.articles-list {
+  display: grid;
+  gap: 12px;
+}
+
+.article-card {
+  padding: 14px;
+  background-color: var(--llm-surface);
+  border: 1px solid var(--llm-border);
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+.article-name {
+  font-weight: 600;
+  color: var(--service-active-text);
+  font-size: 0.95rem;
+}
+
+.article-desc {
+  color: var(--service-text);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.article-json {
+  background-color: var(--bg);
+  border: 1px solid var(--llm-border);
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  overflow-x: auto;
+  color: var(--llm-primary);
+  margin: 0;
 }
 
 .toggle-list {
