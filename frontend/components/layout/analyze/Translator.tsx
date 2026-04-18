@@ -34,8 +34,20 @@ export default function TranslatorPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() && !file) return;
-    console.log({ message, file });
-    router.replace("/response");
+
+    if (message === "mock") router.push("/response/mock");
+
+    const formData = new FormData();
+    formData.append("message", message);
+    if (file) formData.append("file", file);
+
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    router.push(`/response/${data.id}`);
   };
 
   return (
