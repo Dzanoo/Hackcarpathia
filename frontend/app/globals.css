@@ -404,6 +404,11 @@ body {
   min-height: 140px;
 }
 
+.field,
+textarea {
+  color: var(--llm-muted-2);
+}
+
 .field input::placeholder,
 .field textarea::placeholder,
 .search-field input::placeholder {
