@@ -44,27 +44,6 @@ async def ask_ollama(messages: list) -> str:
             logger.error(f"Błąd Ollama: {e}")
             raise HTTPException(500, f"Błąd komunikacji z AI: {e}")
 
-# async def ask_ollama(messages: list) -> str:
-#     return '''{
-#       "document_type": "umowa_zlecenie",
-#       "summary": "To jest umowa zlecenie na pracę kelnera w restauracji na 3 miesiące.",
-#       "key_points": [
-#         "Wynagrodzenie: 25 zł/h",
-#         "Czas trwania: 3 miesiące",
-#         "Kara za niestawienie się: 200 zł"
-#       ],
-#       "risk_flags": [
-#         {
-#           "fragment": "Kara umowna za niestawienie się w pracy: 200 zł",
-#           "explanation": "Pracodawca nie może pobierać kar pieniężnych spoza KP",
-#           "level": "nielegalne",
-#           "legal_basis": "Art. 87 Kodeksu Pracy",
-#           "recommendation": "Nie podpisuj tej umowy bez usunięcia tej klauzuli"
-#         }
-#       ],
-#       "overall_risk": "wysokie"
-#     }'''
-
 def parse_llm_json(raw: str) -> dict:
     """
     Parsuje JSON z odpowiedzi LLM.

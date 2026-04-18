@@ -6,8 +6,9 @@ import json
 import sqlite3
 import uuid
 from prompts import SYSTEM_PROMPT
+import os
 
-DB_PATH = "sessions.db"
+DB_PATH = os.path.join(os.path.dirname(__file__), "sessions.db")
 
 
 def _get_conn() -> sqlite3.Connection:
@@ -38,14 +39,9 @@ def init_db() -> None:
 
 
 def create_session() -> str:
-    """Creates a new session with system prompt. Returns session_id."""
     session_id = str(uuid.uuid4())
     with _get_conn() as conn:
         conn.execute("INSERT INTO sessions (session_id) VALUES (?)", (session_id,))
-        conn.execute(
-            "INSERT INTO messages (session_id, role, content) VALUES (?, ?, ?)",
-            (session_id, "system", SYSTEM_PROMPT)
-        )
     return session_id
 
 
@@ -58,13 +54,14 @@ def session_exists(session_id: str) -> bool:
 
 
 def get_history(session_id: str) -> list:
-    """Returns full message history including system prompt."""
+    """Returns full history with system prompt prepended in memory — not stored in DB."""
     with _get_conn() as conn:
         rows = conn.execute(
             "SELECT role, content FROM messages WHERE session_id = ? ORDER BY id",
             (session_id,)
         ).fetchall()
-    return [{"role": r["role"], "content": r["content"]} for r in rows]
+    messages = [{"role": r["role"], "content": r["content"]} for r in rows]
+    return [{"role": "system", "content": SYSTEM_PROMPT}] + messages
 
 
 def get_public_history(session_id: str) -> list:

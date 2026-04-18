@@ -78,12 +78,23 @@ async def new_session():
     logger.info(f"Nowa sesja: {session_id}")
     return {"session_id": session_id}
 
-@app.get("/session/get")
+@app.get("/session/new")
+async def new_session():
+    """Tworzy nową sesję czatu z pustą historią."""
+    session_id = create_session()
+    logger.info(f"Nowa sesja: {session_id}")
+    return {"session_id": session_id}
+
+
+@app.get("/session/{session_id}/history")
 async def get_session(session_id: str):
-    """Pobiera informacje o sesji."""
     if not session_exists(session_id):
         raise HTTPException(404, "Sesja nie istnieje")
-    return {"session_id": session_id}
+    return {
+        "session_id": session_id,
+        "exists": True,
+        "messages": get_public_history(session_id),
+    }
 
 @app.post("/analyze")
 async def analyze_document(
