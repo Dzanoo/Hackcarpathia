@@ -109,8 +109,6 @@ body {
   #services {
     border-right: none;
     border-bottom: 1px solid var(--services-border);
-    min-height: auto;
-    width: 100%;
   }
 
   .service-button {
