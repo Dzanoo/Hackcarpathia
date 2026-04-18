@@ -5,10 +5,11 @@ sessions.py — SQLite storage for chat sessions
 import json
 import sqlite3
 import uuid
-from prompts import SYSTEM_PROMPT
 import os
+from main import load_sys_prompt
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "sessions.db")
+SYSTEM_PROMPT = load_sys_prompt()
 
 
 def _get_conn() -> sqlite3.Connection:

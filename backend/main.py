@@ -29,14 +29,17 @@ from sessions import (
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-SYS_PROMPT_FILE = "system_prompt.txt"
-SYSTEM_PROMPT = ""
-if os.path.isfile("sys"):
-    with open(SYS_PROMPT_FILE, 'r') as f:
-        SYSTEM_PROMPT = f.read()
-else:
-    print("No system prompt found: " + SYS_PROMPT_FILE)
-    exit(1)
+def load_sys_prompt() -> str:
+    SYS_PROMPT_FILE = "system_prompt.txt"
+    if os.path.isfile("sys"):
+        with open(SYS_PROMPT_FILE, 'r') as f:
+            return f.read()
+    else:
+        print("No system prompt found: " + SYS_PROMPT_FILE)
+        exit(1)
+
+
+SYSTEM_PROMPT = load_sys_prompt()
 
 
 @asynccontextmanager
