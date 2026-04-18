@@ -62,7 +62,7 @@ function riskIcon(level: RiskLevel) {
 }
 
 function formatLabel(str: string) {
-  return str.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return str && str.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export default function ResponsePage() {
@@ -78,6 +78,7 @@ export default function ResponsePage() {
     fetch(`http://172.16.16.13:8000/result/${id}`)
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
         setData(data);
         setLoading(false);
       })
@@ -121,18 +122,13 @@ export default function ResponsePage() {
           <div className="response-kpis">
             <div className="response-kpi">
               <span>Poziom ryzyka</span>
-              <strong>{riskLabel(result.overall_risk)}</strong>
-            </div>
-
-            <div className="response-kpi">
-              <span>Długość tekstu</span>
-              <strong>{data.extracted_text_length} znaków</strong>
+              <strong>{riskLabel(result.overall_risk) || "Brak ryzyka"}</strong>
             </div>
           </div>
         </section>
 
         {/* KEY POINTS */}
-        {result.key_points?.length > 0 && (
+        {result.key_points && result.key_points?.length > 0 && (
           <section className="response-section">
             <h2>
               <ListChecks size={18} />
@@ -156,7 +152,7 @@ export default function ResponsePage() {
             Ryzyka
           </h2>
 
-          {result.risk_flags.length === 0 ? (
+          {!result.risk_flags || result.risk_flags.length === 0 ? (
             <p className="empty-state">Brak wykrytych zagrożeń. Dokument wygląda bezpiecznie.</p>
           ) : (
             <div className="risk-list">

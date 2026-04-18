@@ -1,21 +1,54 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import Loader from "@/components/animations/loading";
 import { Clock3, FileText, Search } from "lucide-react";
 import ServiceScreen from "@/components/menus/ServiceScreen";
 
-const mockHistory = [
-  { title: "Umowa zlecenia", date: "2026-04-18", status: "Gotowe" },
-  { title: "Pismo z urzędu", date: "2026-04-16", status: "Do poprawy" },
-  { title: "Regulamin sklepu", date: "2026-04-14", status: "Gotowe" },
-];
+type HistoryItem = {
+  title?: string;
+  date?: string;
+  status?: string;
+};
 
 export default function HistoryPage() {
   const [query, setQuery] = useState("");
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch("http://172.16.16.13:8000/history");
+        const data = await res.json();
+
+        console.log("API:", data);
+
+        setHistory(Array.isArray(data?.history) ? data.history : []);
+      } catch (err) {
+        console.error("History fetch error:", err);
+        setHistory([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, []);
 
   const filtered = useMemo(() => {
-    return mockHistory.filter((item) => item.title.toLowerCase().includes(query.toLowerCase()));
-  }, [query]);
+    const q = query.toLowerCase();
+
+    return history.filter((item) => (item.title ?? "").toLowerCase().includes(q));
+  }, [query, history]);
+
+  if (loading) {
+    return (
+      <div className="response-loading">
+        <Loader />
+      </div>
+    );
+  }
 
   return (
     <ServiceScreen eyebrow="Analiza AI" title="Historia analiz" description="Przegląd ostatnich dokumentów i wyników.">
@@ -26,20 +59,20 @@ export default function HistoryPage() {
         </label>
 
         <div className="list-card">
-          {filtered.map((item) => (
-            <article className="list-item" key={item.title}>
+          {filtered.map((item, idx) => (
+            <article className="list-item" key={idx}>
               <div className="list-item-icon">
                 <FileText size={18} />
               </div>
 
               <div className="list-item-body">
-                <strong>{item.title}</strong>
+                <strong>{item.title ?? "Brak tytułu"}</strong>
                 <span>
-                  <Clock3 size={14} /> {item.date}
+                  <Clock3 size={14} /> {item.date ?? "brak daty"}
                 </span>
               </div>
 
-              <span className={`status-badge ${item.status === "Gotowe" ? "ok" : "warn"}`}>{item.status}</span>
+              <span className={`status-badge ${item.status === "Gotowe" ? "ok" : "warn"}`}>{item.status ?? "—"}</span>
             </article>
           ))}
 
