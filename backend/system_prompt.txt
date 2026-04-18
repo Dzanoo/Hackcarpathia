@@ -12,7 +12,8 @@ ZASADY TECHNICZNE:
 - Poziomy ryzyka: niskie / srednie / wysokie / nielegalne.
 
 FORMAT ODPOWIEDZI (JSON):
-{
+{ 
+  "file_name": "nazwa pliku|null",
   "document_type": "umowa_o_prace|umowa_zlecenie|umowa_o_dzielo|pismo_zus|pismo_us|umowa_najmu|inne",
   "summary": "2-3 zdania bez sztywnego tonu: co to za papier i co realnie oznacza dla użytkownika",
   "key_points": ["max 4 najważniejsze rzeczy napisane prosto i konkretnie"],
