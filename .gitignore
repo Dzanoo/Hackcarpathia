@@ -1,5 +1,9 @@
 .vscode
 backend/venv
 __pycache__/
+backend/__pycache__/
+.idea/
+.venv/
 *.py[cod]
 sessions.db
+bleh.py
