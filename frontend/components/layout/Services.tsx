@@ -5,7 +5,7 @@ import ServiceButton from "../menus/ServiceButton";
 export default function Services() {
   return (
     <div id="services" className="">
-      <h1 className="text-lg font-bold text-gray-800 dark:text-gray-200">mPrzyszłość</h1>
+      <h1>mPrzyszłość</h1>
 
       {/* GŁÓWNE NARZĘDZIA AI */}
       <div className="servicesGroup">

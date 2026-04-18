@@ -1,4 +1,6 @@
 :root {
+  --text: #3a3f58;
+  --bg: #ffffff;
   --services-bg: #ffffff;
   --services-border: #e2e5ef;
   --service-text: #3a3f58;
@@ -13,6 +15,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    --text: #ffffff;
+    --bg: #252525;
     --services-bg: #252525;
     --services-border: #2a2a2a;
     --service-text: #e0e0e0;
@@ -27,6 +31,7 @@
 body {
   margin: 0;
   padding: 0;
+  background-color: var(--bg);
 }
 
 #services {
@@ -116,4 +121,8 @@ body {
   .service-button {
     padding: 0.85rem 1rem; /* Większe pole dotykowe na telefonie */
   }
+}
+
+h1 {
+  color: var(--text);
 }
