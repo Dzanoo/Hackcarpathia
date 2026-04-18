@@ -40,7 +40,7 @@
     --service-icon-idle: #666666;
     --llm-card: #1f1f1f;
     --llm-border: #2c2c2c;
-    --llm-surface: #1a1f36;
+    --llm-surface: #29292b;
     --llm-surface-2: #232845;
     --llm-primary: #7c94ff;
     --llm-primary-2: #5c7cff;
@@ -117,7 +117,7 @@ body {
   gap: 12px;
   padding: 0.85rem 1rem;
   border: 1px solid transparent;
-  border-top: 1px solid #e8e8e8;
+  border-top: 1px solid #565454;
   background-color: transparent;
   color: var(--service-text);
   cursor: pointer;
@@ -272,12 +272,16 @@ body {
   flex-direction: column;
 }
 
+.button-container h2 {
+  margin-top: 10px;
+}
+
 .icon-button {
   width: 44px;
   height: 44px;
   border: 1px solid var(--llm-border);
   border-radius: 14px;
-  background: var(--llm-surface);
+  background: #1a1f36;
   color: var(--text);
   display: inline-flex;
   align-items: center;
