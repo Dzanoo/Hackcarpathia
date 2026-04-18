@@ -175,7 +175,7 @@ body {
 .service-page {
   min-height: 100dvh;
   padding: 16px;
-  background: linear-gradient(180deg, rgba(79, 110, 247, 0.06), transparent 180px), var(--bg);
+  background: var(--bg);
 }
 
 .service-page-shell {
