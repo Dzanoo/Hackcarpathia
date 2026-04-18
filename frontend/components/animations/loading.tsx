@@ -5,7 +5,7 @@ const Loader = () => {
   return (
     <div className="loading-overlay">
       <StyledWrapper>
-        <h1 className="loading-title">Loading...</h1>
+        <h1 className="loading-title">Analizowanie</h1>
         <section className="dots-container">
           <div className="dot" />
           <div className="dot" />
