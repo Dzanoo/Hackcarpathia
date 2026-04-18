@@ -69,24 +69,18 @@ export default function TranslatorPage() {
                 <p>PDF, DOCX, TXT...</p>
               </div>
               <div className="button-container">
-              <button type="button" className="icon-button greenBtn" onClick={() => alert("Funkcja niedostępna w tej wersji")} aria-label="Zrób zdjęcie">
-                <Camera size={18} color="green" />
-              </button>
+                <button type="button" className="icon-button greenBtn" onClick={() => alert("Funkcja niedostępna w tej wersji")} aria-label="Zrób zdjęcie">
+                  <Camera size={18} color="green" />
+                </button>
                 <h2>Zrób zdjęcie</h2>
                 <p>Jedno lub kilka</p>
               </div>
             </div>
           </div>
 
-          {/* <input ref={fileInputRef} type="file" className="hidden-input" onChange={(e) => setFile(e.target.files?.[0] ?? null)} accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp" />
+          <input ref={fileInputRef} type="file" className="hidden-input" onChange={(e) => setFile(e.target.files?.[0] ?? null)} accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp" />
 
-          {!file ? (
-            <button type="button" className="dropzone" onClick={() => fileInputRef.current?.click()}>
-              <FileText size={30} />
-              <span>Dotknij, aby wybrać plik</span>
-              <small>Plik będzie dołączony do wiadomości.</small>
-            </button>
-          ) : (
+          {file !== null && (
             <div className="file-preview">
               <div className="file-meta">
                 <div className="file-icon">
@@ -111,7 +105,7 @@ export default function TranslatorPage() {
             <div className="image-preview">
               <img src={previewUrl} alt="Podgląd pliku" />
             </div>
-          )} */}
+          )}
         </section>
 
         <section className="form-block">
