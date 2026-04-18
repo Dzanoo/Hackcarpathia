@@ -18,6 +18,7 @@
     --text: #ffffff;
     --bg: #252525;
     --services-bg: #252525;
+    --services-group-bg: #444242;
     --services-border: #2a2a2a;
     --service-text: #e0e0e0;
     --service-text-secondary: #808080;
@@ -59,6 +60,13 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px; /* Odstęp między przyciskami wewnątrz grupy */
+}
+
+.servicesButtons {
+  background-color: var(--services-group-bg);
+  border-radius: 15px;
+  width: 85%;
+  margin: 0;
 }
 
 .service-button {
