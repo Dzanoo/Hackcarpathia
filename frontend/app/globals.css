@@ -1,0 +1,128 @@
+:root {
+  --text: #3a3f58;
+  --bg: #ffffff;
+  --services-bg: #ffffff;
+  --services-border: #e2e5ef;
+  --service-text: #3a3f58;
+  --service-text-secondary: #9298b0;
+  --service-hover: #f0f3ff;
+  --service-active: #eef1fe;
+  --service-active-text: #2d47c9;
+  --service-icon-active: #4f6ef7;
+  --service-icon-idle: #9298b0;
+  --badge-bg: #ef4444;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #ffffff;
+    --bg: #252525;
+    --services-bg: #252525;
+    --services-border: #2a2a2a;
+    --service-text: #e0e0e0;
+    --service-text-secondary: #808080;
+    --service-hover: #1e1e1e;
+    --service-active: #1a1f36;
+    --service-active-text: #7c94ff;
+    --service-icon-active: #5c7cff;
+    --service-icon-idle: #666666;
+  }
+}
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+}
+
+#services {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Odstęp między grupami CRM, EVENTS itd. */
+  padding: 1rem;
+  background-color: var(--services-bg);
+  border-right: 1px solid var(--services-border);
+  min-height: 100vh;
+  transition: all 0.2s ease;
+}
+
+/* Nagłówki grup (CRM, EVENTS) */
+#services p {
+  margin: 0 0 0.5rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--service-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.servicesGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Odstęp między przyciskami wewnątrz grupy */
+}
+
+.service-button {
+  display: flex;
+  align-items: center;
+  width: 100%; /* Pełna szerokość na mobile */
+  gap: 12px;
+  padding: 0.75rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background-color: transparent;
+  color: var(--service-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.service-button:hover {
+  background-color: var(--service-hover);
+}
+
+.service-button.active {
+  background-color: var(--service-active);
+  color: var(--service-active-text);
+}
+
+/* Ikony */
+.service-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--service-icon-idle);
+  transition: color 0.2s;
+}
+
+.service-button.active .service-icon {
+  color: var(--service-icon-active);
+}
+
+/* Etykiety */
+.service-label {
+  flex: 1;
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.service-button.active .service-label {
+  font-weight: 600;
+}
+
+/* NAPRAWA DLA TELEFONU (Pod sobą) */
+@media (max-width: 768px) {
+  #services {
+    border-right: none;
+    border-bottom: 1px solid var(--services-border);
+    min-height: auto;
+    width: 100%;
+  }
+
+  .service-button {
+    padding: 0.85rem 1rem; /* Większe pole dotykowe na telefonie */
+  }
+}
+
+h1 {
+  color: var(--text);
+}
