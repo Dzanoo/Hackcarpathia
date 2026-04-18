@@ -6,7 +6,8 @@ import json
 import sqlite3
 import uuid
 import os
-from main import load_sys_prompt
+
+from backend.prompt_importer import load_sys_prompt
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "sessions.db")
 SYSTEM_PROMPT = load_sys_prompt()

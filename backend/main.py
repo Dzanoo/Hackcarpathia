@@ -4,13 +4,13 @@ Uruchom: uvicorn main:app --port 8000 --reload
 """
 import json
 import logging
-import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from backend.prompt_importer import load_sys_prompt
 from ocr import extract_text
 from ollama import ask_ollama, check_ollama_health, parse_llm_json
 from sessions import (
@@ -29,18 +29,7 @@ from sessions import (
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def load_sys_prompt() -> str:
-    SYS_PROMPT_FILE = "system_prompt.txt"
-    if os.path.isfile("sys"):
-        with open(SYS_PROMPT_FILE, 'r') as f:
-            return f.read()
-    else:
-        print("No system prompt found: " + SYS_PROMPT_FILE)
-        exit(1)
-
-
 SYSTEM_PROMPT = load_sys_prompt()
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

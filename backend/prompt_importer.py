@@ -1,3 +1,6 @@
+import os
+
+
 def load_sys_prompt() -> str:
     SYS_PROMPT_FILE = "system_prompt.txt"
     if os.path.isfile("sys"):
