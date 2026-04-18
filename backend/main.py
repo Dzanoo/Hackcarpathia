@@ -23,6 +23,7 @@ from sessions import (
     session_exists,
     get_db_new_id,
     get_history_all,
+    get_db_result
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -161,6 +162,15 @@ async def history(session_id: str):
 async def history():
     """Zwraca historię wiadomości sesji (bez system promptu)."""
     return {"history": get_history_all()}
+
+@app.get("/result/{id}")
+async def get_result(id: str):
+    """Zwraca wynik z bazy danych."""
+    result = get_db_result(id)
+    if not result:
+        raise HTTPException(404, "Wynik nie istnieje")
+    return {"result": result}
+
 
 @app.delete("/session/{session_id}")
 async def remove_session(session_id: str):
