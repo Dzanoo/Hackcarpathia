@@ -11,7 +11,7 @@ export default function Services() {
       <div className="servicesGroup">
         <p>Analiza AI</p>
         <div className="servicesButtons">
-          <ServiceButton icon={<FileSearch size={20} color="purple" />} label="Tłumacz Pism" href="/analyze/translator" />
+          <ServiceButton icon={<FileSearch size={20} color="purple" />} label="Analizuj dokument" href="/analyze/translator" />
           <ServiceButton icon={<History size={20} color="purple" />} label="Historia Analiz" href="/analyze/history" />
         </div>
       </div>

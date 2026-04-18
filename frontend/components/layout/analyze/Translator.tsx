@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FileText, Paperclip, Send, X } from "lucide-react";
+import { FileText, Paperclip, Send, X, FileSpreadsheet, Camera } from "lucide-react";
 import ServiceScreen from "@/components/menus/ServiceScreen";
 
 export default function TranslatorPage() {
@@ -51,21 +51,34 @@ export default function TranslatorPage() {
   };
 
   return (
-    <ServiceScreen eyebrow="Analiza AI" title="Tłumacz pism" description="Załącz dokument i opisz co chciałbyś się dowiedzieć.">
+    <ServiceScreen eyebrow="Analiza AI" title="Analizuj dokument" description="Załącz dokument i opisz co chciałbyś się dowiedzieć.">
       <form className="service-form" onSubmit={onSubmit}>
         <section className="form-block">
           <div className="form-block-top">
             <div>
-              <h2>Załącz dokument</h2>
+              <h2>Dodaj dokument</h2>
               <p>PDF, DOCX, TXT, PNG, JPG, WEBP.</p>
             </div>
 
-            <button type="button" className="icon-button" onClick={() => fileInputRef.current?.click()} aria-label="Dodaj plik">
-              <Paperclip size={18} />
-            </button>
+            <div className="button-row">
+              <div className="button-container">
+                <button type="button" className="icon-button" onClick={() => fileInputRef.current?.click()} aria-label="Z urządzenia">
+                  <FileSpreadsheet size={18} />
+                </button>
+                <h2>Z urządzenia</h2>
+                <p>PDF, DOCX, TXT...</p>
+              </div>
+              <div className="button-container">
+              <button type="button" className="icon-button greenBtn" onClick={() => alert("Funkcja niedostępna w tej wersji")} aria-label="Zrób zdjęcie">
+                <Camera size={18} color="green" />
+              </button>
+                <h2>Zrób zdjęcie</h2>
+                <p>Jedno lub kilka</p>
+              </div>
+            </div>
           </div>
 
-          <input ref={fileInputRef} type="file" className="hidden-input" onChange={(e) => setFile(e.target.files?.[0] ?? null)} accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp" />
+          {/* <input ref={fileInputRef} type="file" className="hidden-input" onChange={(e) => setFile(e.target.files?.[0] ?? null)} accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp" />
 
           {!file ? (
             <button type="button" className="dropzone" onClick={() => fileInputRef.current?.click()}>
@@ -98,20 +111,17 @@ export default function TranslatorPage() {
             <div className="image-preview">
               <img src={previewUrl} alt="Podgląd pliku" />
             </div>
-          )}
+          )} */}
         </section>
 
         <section className="form-block">
-          <label htmlFor="message">Wiadomość do LLM</label>
+          <label htmlFor="message">Twoje pytanie</label>
           <textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Np. przetłumacz na prosty język i wypisz najważniejsze punkty..." rows={8} />
-          <div className="hint-row">
-            <span>Wersja tymczasowa bez integracji z modelem.</span>
-            <span>{message.length} znaków</span>
-          </div>
         </section>
 
         <button className="primary-button" type="submit">
           <Send size={18} />
+          <h2>Analizuj dokument</h2>
         </button>
       </form>
     </ServiceScreen>
