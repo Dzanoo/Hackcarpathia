@@ -12,7 +12,6 @@ export default function Services() {
         <p>Analiza AI</p>
         <div className="servicesButtons">
           <ServiceButton icon={<FileSearch size={20} color="purple" />} label="Tłumacz Pism" href="/analyze/translator" />
-          <ServiceButton icon={<Scale size={20} color="purple" />} label="Weryfikacja Umów" href="/analyze/contracts" />
           <ServiceButton icon={<History size={20} color="purple" />} label="Historia Analiz" href="/analyze/history" />
         </div>
       </div>
