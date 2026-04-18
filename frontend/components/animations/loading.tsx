@@ -1,19 +1,22 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 const Loader = () => {
   return (
-    <StyledWrapper>
-      <section className="dots-container">
-        <div className="dot" />
-        <div className="dot" />
-        <div className="dot" />
-        <div className="dot" />
-        <div className="dot" />
-      </section>
-    </StyledWrapper>
+    <div className="loading-overlay">
+      <StyledWrapper>
+        <h1 className="loading-title">Loading...</h1>
+        <section className="dots-container">
+          <div className="dot" />
+          <div className="dot" />
+          <div className="dot" />
+          <div className="dot" />
+          <div className="dot" />
+        </section>
+      </StyledWrapper>
+    </div>
   );
-}
+};
 
 const StyledWrapper = styled.div`
   .dots-container {
@@ -24,11 +27,15 @@ const StyledWrapper = styled.div`
     width: 100%;
   }
 
+  .loading-title {
+    text-align: center;
+  }
+
   .dot {
-    height: 20px;
-    width: 20px;
+    height: 30px;
+    width: 30px;
     margin-right: 10px;
-    border-radius: 10px;
+    border-radius: 15px;
     background-color: #b3d4fc;
     animation: pulse 1.5s infinite ease-in-out;
   }
@@ -67,6 +74,7 @@ const StyledWrapper = styled.div`
       background-color: #b3d4fc;
       box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
     }
-  }`;
+  }
+`;
 
 export default Loader;

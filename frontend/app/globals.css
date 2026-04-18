@@ -693,3 +693,11 @@ textarea {
     grid-template-columns: 1fr 1fr;
   }
 }
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}

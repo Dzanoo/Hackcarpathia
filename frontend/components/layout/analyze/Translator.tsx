@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FileText, Paperclip, Send, X } from "lucide-react";
 import ServiceScreen from "@/components/menus/ServiceScreen";
@@ -9,7 +10,7 @@ export default function TranslatorPage() {
   const [message, setMessage] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [sending, setSending] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (!file || !file.type.startsWith("image/")) {
@@ -33,14 +34,8 @@ export default function TranslatorPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() && !file) return;
-
-    setSending(true);
-    try {
-      await new Promise((r) => setTimeout(r, 700));
-      console.log({ message, file });
-    } finally {
-      setSending(false);
-    }
+    console.log({ message, file });
+    router.replace("/response");
   };
 
   return (
@@ -103,9 +98,8 @@ export default function TranslatorPage() {
           </div>
         </section>
 
-        <button className="primary-button" type="submit" disabled={sending || (!message.trim() && !file)}>
+        <button className="primary-button" type="submit">
           <Send size={18} />
-          {sending ? "Wysyłanie..." : "Wyślij do LLM"}
         </button>
       </form>
     </ServiceScreen>

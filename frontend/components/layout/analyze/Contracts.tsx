@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { FileText, Paperclip, ShieldAlert, X } from "lucide-react";
 import ServiceScreen from "@/components/menus/ServiceScreen";
+import { useRouter } from "next/navigation";
 
 export default function ContractsPage() {
   const [file, setFile] = useState<File | null>(null);
   const [focus, setFocus] = useState("");
   const [riskLevel, setRiskLevel] = useState("średnie");
+  const router = useRouter();
 
   return (
     <ServiceScreen eyebrow="Analiza AI" title="Weryfikacja umów" description="Dodaj umowę i wskaż, na czym ma skupić się analiza.">
@@ -75,7 +77,7 @@ export default function ContractsPage() {
           </div>
         </section>
 
-        <button className="primary-button" type="button" disabled={!file && !focus.trim()}>
+        <button className="primary-button" type="button" onClick={() => router.replace("/response")}>
           Analizuj umowę
         </button>
       </div>
