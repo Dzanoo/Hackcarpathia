@@ -1,9 +1,9 @@
 "use client";
 
 import Loader from "@/components/animations/loading";
-import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
-import { AlertTriangle, FileText, Info, ListChecks, ShieldAlert, ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { FileText, ShieldCheck, Info, AlertTriangle, ShieldAlert, ListChecks } from "lucide-react";
 
 type RiskLevel = "niskie" | "srednie" | "wysokie" | "nielegalne";
 
@@ -15,59 +15,40 @@ type RiskFlag = {
   recommendation: string;
 };
 
-type ResponseData = {
-  document_type: "umowa_o_prace" | "umowa_zlecenie" | "umowa_o_dzielo" | "pismo_zus" | "pismo_us" | "umowa_najmu" | "inne";
-  summary: string;
-  key_points: string[];
-  risk_flags: RiskFlag[];
-  overall_risk: RiskLevel;
+type ApiResponse = {
+  session_id: string | null;
+  extracted_text_length: number;
+  result: {
+    document_type: string;
+    summary: string;
+    key_points: string[];
+    risk_flags: RiskFlag[];
+    overall_risk: RiskLevel;
+  };
 };
 
-const MOCK_RESPONSE: ResponseData = {
-  document_type: "umowa_o_prace",
-  summary:
-    "Dokument wygląda na standardową umowę o pracę, ale zawiera kilka zapisów wymagających doprecyzowania. Największą uwagę zwracają zasady wypowiedzenia, ewentualne kary oraz zapisy dotyczące czasu pracy i wynagrodzenia.",
-  key_points: ["Rodzaj umowy: umowa o pracę", "Występują zapisy, które warto zweryfikować przed podpisaniem", "Warto sprawdzić okres wypowiedzenia i odpowiedzialność finansową"],
-  risk_flags: [
-    {
-      fragment: "pracodawca może nałożyć karę w wysokości ustalonej jednostronnie",
-      explanation: "Zapis jest nieprecyzyjny i może działać na niekorzyść pracownika.",
-      level: "wysokie",
-      legal_basis: "null",
-      recommendation: "Poproś o doprecyzowanie kwoty, podstawy i trybu nałożenia kary.",
-    },
-    {
-      fragment: "czas pracy ustala się według potrzeb firmy",
-      explanation: "Sformułowanie jest zbyt ogólne i może prowadzić do niejasności.",
-      level: "srednie",
-      legal_basis: "null",
-      recommendation: "Doprecyzuj harmonogram, normy czasu pracy i zasady nadgodzin.",
-    },
-    {
-      fragment: "okres wypowiedzenia wynosi 1 tydzień",
-      explanation: "Może być zgodne tylko w określonych przypadkach i wymaga sprawdzenia.",
-      level: "wysokie",
-      legal_basis: "Art. 36 KP",
-      recommendation: "Zweryfikuj, czy okres wypowiedzenia jest zgodny z typem umowy i stażem.",
-    },
-  ],
-  overall_risk: "wysokie",
+const MOCK: ApiResponse = {
+  session_id: null,
+  extracted_text_length: 119,
+  result: {
+    document_type: "faktura",
+    summary: "Faktura za usługę związaną ze ślubem Anny Kowalskiej, opiewająca na kwotę 12000 zł, oznaczona jako zapłacona.",
+    overall_risk: "niskie",
+    key_points: ["Kwota do zapłaty: 12000 zł", "Usługa dotyczy ślubu", "Faktura została opłacona", "Brak zaległości"],
+    risk_flags: [],
+  },
 };
 
-function getRiskLabel(level: RiskLevel) {
-  switch (level) {
-    case "niskie":
-      return "Niskie";
-    case "srednie":
-      return "Średnie";
-    case "wysokie":
-      return "Wysokie";
-    case "nielegalne":
-      return "Nielegalne";
-  }
+function riskLabel(level: RiskLevel) {
+  return {
+    niskie: "Niskie",
+    srednie: "Średnie",
+    wysokie: "Wysokie",
+    nielegalne: "Nielegalne",
+  }[level];
 }
 
-function getRiskIcon(level: RiskLevel) {
+function riskIcon(level: RiskLevel) {
   switch (level) {
     case "niskie":
       return <ShieldCheck size={18} />;
@@ -80,30 +61,31 @@ function getRiskIcon(level: RiskLevel) {
   }
 }
 
-function normalizeLabel(value: string) {
-  return value.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+function formatLabel(str: string) {
+  return str.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export default function ResponsePage() {
-  const params = useParams<{ id?: string }>();
-  const id = typeof params?.id === "string" ? params.id : "mock";
-
+  const { id } = useParams();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<ResponseData | null>(null);
+  const [data, setData] = useState<ApiResponse | null>(null);
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      setData(MOCK_RESPONSE);
-      setLoading(false);
-    }, 1200);
+    if (!id) return;
 
-    return () => clearTimeout(t);
+    setLoading(true);
+
+    fetch(`http://172.16.16.13:8000/result/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setData(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setData(null);
+        setLoading(false);
+      });
   }, [id]);
-
-  const riskCount = useMemo(() => {
-    if (!data) return 0;
-    return data.risk_flags.length;
-  }, [data]);
 
   if (loading || !data) {
     return (
@@ -113,80 +95,88 @@ export default function ResponsePage() {
     );
   }
 
+  const result = data.result;
+
   return (
     <main className="response-page">
       <section className="response-shell">
-        <header className="response-topbar">
-          <span className={`risk-badge ${data.overall_risk}`}>
-            {getRiskIcon(data.overall_risk)}
-            {getRiskLabel(data.overall_risk)}
-          </span>
-        </header>
+        {/* TOP */}
+        <div className="response-topbar">
+          <div className="response-id">
+            <FileText size={16} />
+            <span>{formatLabel(result.document_type)}</span>
+          </div>
 
+          <div className={`risk-badge ${result.overall_risk}`}>
+            {riskIcon(result.overall_risk)}
+            {riskLabel(result.overall_risk)}
+          </div>
+        </div>
+
+        {/* HERO */}
         <section className="response-hero">
-          <p className="response-eyebrow">Wynik analizy AI</p>
-          <h1>{normalizeLabel(data.document_type)}</h1>
-          <p className="response-summary">{data.summary}</p>
+          <h1>{formatLabel(result.document_type)}</h1>
+          <p className="response-summary">{result.summary}</p>
 
           <div className="response-kpis">
             <div className="response-kpi">
               <span>Poziom ryzyka</span>
-              <strong>{getRiskLabel(data.overall_risk)}</strong>
+              <strong>{riskLabel(result.overall_risk)}</strong>
             </div>
 
             <div className="response-kpi">
-              <span>Wskaźniki ryzyka</span>
-              <strong>{riskCount}</strong>
+              <span>Długość tekstu</span>
+              <strong>{data.extracted_text_length} znaków</strong>
             </div>
           </div>
         </section>
 
-        <section className="response-section">
-          <h2>
-            <ListChecks size={18} />
-            Kluczowe punkty
-          </h2>
+        {/* KEY POINTS */}
+        {result.key_points?.length > 0 && (
+          <section className="response-section">
+            <h2>
+              <ListChecks size={18} />
+              Kluczowe informacje
+            </h2>
 
-          <div className="pill-list">
-            {data.key_points.map((point) => (
-              <span className="pill" key={point}>
-                {point}
-              </span>
-            ))}
-          </div>
-        </section>
+            <div className="pill-list">
+              {result.key_points.map((p, i) => (
+                <span className="pill" key={i}>
+                  {p}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
 
+        {/* RISK FLAGS */}
         <section className="response-section">
           <h2>
             <AlertTriangle size={18} />
-            Zapisane ryzyka
+            Ryzyka
           </h2>
 
-          <div className="risk-list">
-            {data.risk_flags.map((flag, index) => (
-              <article className="risk-item" key={`${flag.fragment}-${index}`}>
-                <div className="risk-head">
-                  <span className={`risk-chip ${flag.level}`}>{getRiskLabel(flag.level)}</span>
-                  <span className="risk-basis">{flag.legal_basis ? flag.legal_basis : "Brak podstawy"}</span>
+          {result.risk_flags.length === 0 ? (
+            <p className="empty-state">Brak wykrytych zagrożeń. Dokument wygląda bezpiecznie.</p>
+          ) : (
+            <div className="risk-list">
+              {result.risk_flags.map((r, i) => (
+                <div className="risk-item" key={i}>
+                  <div className="risk-head">
+                    <span className={`risk-chip ${r.level}`}>{riskLabel(r.level)}</span>
+                  </div>
+
+                  <p className="risk-fragment">„{r.fragment}”</p>
+                  <p className="risk-explanation">{r.explanation}</p>
+
+                  <div className="risk-recommendation">
+                    <strong>Rekomendacja</strong>
+                    <p>{r.recommendation}</p>
+                  </div>
                 </div>
-
-                <p className="risk-fragment">„{flag.fragment}”</p>
-                <p className="risk-explanation">{flag.explanation}</p>
-
-                <div className="risk-recommendation">
-                  <strong>Rekomendacja</strong>
-                  <p>{flag.recommendation}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="response-section">
-          <details className="raw-json">
-            <summary>Surowy JSON</summary>
-            <pre>{JSON.stringify(data, null, 2)}</pre>
-          </details>
+              ))}
+            </div>
+          )}
         </section>
       </section>
     </main>
