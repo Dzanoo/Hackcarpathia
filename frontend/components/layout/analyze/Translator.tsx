@@ -41,7 +41,7 @@ export default function TranslatorPage() {
     formData.append("message", message);
     if (file) formData.append("file", file);
 
-    const res = await fetch("/api/analyze", {
+    const res = await fetch("http://172.16.16.13:8000/analyze", {
       method: "POST",
       body: formData,
     });
