@@ -272,6 +272,10 @@ body {
   flex-direction: column;
 }
 
+.button-container h2 {
+  margin-top: 10px;
+}
+
 .icon-button {
   width: 44px;
   height: 44px;
