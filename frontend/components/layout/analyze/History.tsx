@@ -5,11 +5,44 @@ import Loader from "@/components/animations/loading";
 import { Clock3, FileText, Search } from "lucide-react";
 import ServiceScreen from "@/components/menus/ServiceScreen";
 
-type HistoryItem = {
-  title?: string;
-  date?: string;
-  status?: string;
+type HistoryContent = {
+  document_type: string;
+  summary: string;
+  key_points?: string[];
+  observations?: string[];
+  risk_flags?: unknown[];
+  overall_risk: string;
+  file_name?: string;
 };
+
+type HistoryItem = {
+  date?: string;
+  created_at?: string;
+  status?: string;
+  content: HistoryContent;
+};
+
+type ApiResponse = {
+  history?: HistoryItem[];
+};
+
+function normalizeHistoryItem(item: HistoryItem): HistoryItem {
+  let content: HistoryContent = item.content;
+
+  if (typeof content === "string") {
+    try {
+      content = JSON.parse(content) as HistoryContent;
+    } catch {
+      // fallback – zostaw surowe
+    }
+  }
+
+  return {
+    ...item,
+    content,
+    date: item.date ?? item.created_at,
+  };
+}
 
 export default function HistoryPage() {
   const [query, setQuery] = useState("");
@@ -20,11 +53,11 @@ export default function HistoryPage() {
     const load = async () => {
       try {
         const res = await fetch("http://172.16.16.13:8000/history");
-        const data = await res.json();
+        const data: ApiResponse = await res.json();
 
-        console.log("API:", data);
+        console.log(data);
 
-        setHistory(Array.isArray(data?.history) ? data.history : []);
+        setHistory(Array.isArray(data?.history) ? data.history.map(normalizeHistoryItem) : []);
       } catch (err) {
         console.error("History fetch error:", err);
         setHistory([]);
@@ -39,7 +72,14 @@ export default function HistoryPage() {
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
 
-    return history.filter((item) => (item.title ?? "").toLowerCase().includes(q));
+    return history.filter((item) => {
+      const title = (item.content.file_name ?? "").toLowerCase();
+      const type = (item.content?.document_type ?? "").toLowerCase();
+      const summary = (item.content?.summary ?? "").toLowerCase();
+      console.log(item);
+
+      return title.includes(q) || type.includes(q) || summary.includes(q);
+    });
   }, [query, history]);
 
   if (loading) {
@@ -66,7 +106,8 @@ export default function HistoryPage() {
               </div>
 
               <div className="list-item-body">
-                <strong>{item.title ?? "Brak tytułu"}</strong>
+                <strong>{item.content.file_name ?? item.content?.document_type ?? "Brak tytułu"}</strong>
+
                 <span>
                   <Clock3 size={14} /> {item.date ?? "brak daty"}
                 </span>

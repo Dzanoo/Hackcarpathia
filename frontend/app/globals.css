@@ -1084,3 +1084,177 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+/* =====================
+   Detail grid (analiza)
+===================== */
+
+.detail-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.detail-card {
+  border: 1px solid var(--llm-border);
+  border-radius: 18px;
+  background: var(--llm-surface);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.detail-card h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--llm-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--llm-border);
+}
+
+.detail-label {
+  font-size: 0.82rem;
+  color: var(--llm-muted);
+  font-weight: 600;
+  padding-top: 1px;
+}
+
+.detail-value {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* =====================
+   Risk list (ryzyka)
+===================== */
+
+.risk-list {
+  display: grid;
+  gap: 8px;
+}
+
+.risk-item {
+  border-left: 3px solid #dc2626;
+  border-radius: 0 14px 14px 0;
+  background: rgba(239, 68, 68, 0.07);
+  padding: 10px 14px;
+}
+
+.risk-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.risk-note {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--llm-surface);
+  border: 1px solid var(--llm-border);
+  font-size: 0.85rem;
+  color: var(--llm-muted);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* =====================
+   Benefit list (korzyści)
+===================== */
+
+.benefit-list {
+  display: grid;
+  gap: 8px;
+}
+
+.benefit-item {
+  border-left: 3px solid #16a34a;
+  border-radius: 0 14px 14px 0;
+  background: rgba(34, 197, 94, 0.07);
+  padding: 10px 14px;
+}
+
+.benefit-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+/* =====================
+   Tips (wskazówki)
+===================== */
+
+.tips-list,
+.warning-list {
+  display: grid;
+  gap: 8px;
+}
+
+.tip-item {
+  border-left: 3px solid var(--llm-primary);
+  border-radius: 0 14px 14px 0;
+  background: rgba(79, 110, 247, 0.07);
+  padding: 10px 14px;
+}
+
+.tip-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.warning-item {
+  border-left: 3px solid #d97706;
+  border-radius: 0 14px 14px 0;
+  background: rgba(245, 158, 11, 0.07);
+  padding: 10px 14px;
+}
+
+.warning-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+/* =====================
+   Section h2 spacing
+===================== */
+
+.response-section h2 + .tips-list,
+.response-section h2 + .warning-list,
+.response-section h2 + .risk-list,
+.response-section h2 + .benefit-list {
+  margin-top: 0;
+}
+
+.response-section h2:not(:first-child) {
+  margin-top: 16px;
+}
+
+/* =====================
+   Responsive detail-row
+===================== */
+
+@media (max-width: 480px) {
+  .detail-row {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .detail-label {
+    color: var(--llm-primary);
+    font-size: 0.78rem;
+  }
+}
