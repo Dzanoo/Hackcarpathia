@@ -10,7 +10,7 @@ from fastapi import HTTPException
 
 logger = logging.getLogger(__name__)
 
-OLLAMA_URL = "http://172.16.16.8:11434/api/chat"
+OLLAMA_URL = "http://172.16.16.30:11434/api/chat"
 OLLAMA_MODEL = "SpeakLeash/bielik-11b-v3.0-instruct:Q4_K_M"   # zmień na model który masz: mistral, phi3, gemma2
 OLLAMA_TIMEOUT = 120.0
 
@@ -29,8 +29,8 @@ async def ask_ollama(messages: list) -> str:
                 "format": "json",
                 "options": {
                     "temperature": 0.1, # near-deterministic — you want consistent structured output, not creativity
-                    #"num_predict": 1000, # enough for the JSON structure, prevents rambling
-                    "num_ctx": 4096,    # explicit per-request context (matches your server setting)
+                    #num_predict": 1000, # enough for the JSON structure, prevents rambling
+                    "num_ctx": 8196,    # explicit per-request context (matches your server setting)
                     "repeat_penalty": 1.1,  # discourages the model from repeating itself in long outputs
                 },
             })
