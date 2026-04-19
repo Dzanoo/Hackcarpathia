@@ -85,7 +85,7 @@ def get_history(session_id: str) -> list:
 def get_history_all() -> list:
     with _get_conn() as conn:
         rows = conn.execute(
-            "SELECT role, content, created_at FROM messages WHERE role = 'assistant' ORDER BY id",
+            "SELECT role, content, created_at, id FROM messages WHERE role = 'assistant' ORDER BY id",
         ).fetchall()
     
     result = []
@@ -98,6 +98,7 @@ def get_history_all() -> list:
             "role": r["role"],
             "content": content,
             "created_at": r["created_at"],
+            "id": r["id"]
         })
     return result
 
