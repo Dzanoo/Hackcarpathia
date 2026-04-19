@@ -158,7 +158,7 @@ export default function ResponsePage() {
           ) : (
             <div className="risk-list">
               {result.risk_flags.map((r, i) => (
-                <div className="risk-item" key={i}>
+                <div className={`risk-item ${r.level}`} key={i}>
                   <div className="risk-head">
                     <span className={`risk-chip ${r.level}`}>
                       {riskIcon(r.level)}
