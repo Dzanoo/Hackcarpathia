@@ -1258,3 +1258,336 @@ textarea {
     font-size: 0.78rem;
   }
 }
+
+/* =========================
+   Failed / Error page
+========================= */
+
+.failed-page {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+}
+
+.failed-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  max-width: 480px;
+  width: 100%;
+  padding: 24px 16px 40px;
+  text-align: center;
+}
+
+/* ── Ikona ── */
+
+.failed-icon-wrap {
+  position: relative;
+}
+
+.failed-icon-ring {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--fail-color) 12%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--fail-color) 25%, transparent);
+  animation: failed-pulse 2.4s ease-in-out infinite;
+}
+
+.failed-icon {
+  color: var(--fail-color);
+  display: grid;
+  place-items: center;
+}
+
+@keyframes failed-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--fail-color) 18%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--fail-color) 0%, transparent);
+  }
+}
+
+/* ── Treść ── */
+
+.failed-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.failed-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--llm-muted);
+}
+
+.failed-title {
+  margin: 0;
+  font-size: clamp(1.3rem, 4vw, 1.7rem);
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.failed-description {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--llm-muted);
+  max-width: 380px;
+}
+
+.failed-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 4px;
+  padding: 12px 14px;
+  background: var(--llm-surface);
+  border: 1px solid var(--llm-border);
+  border-radius: 16px;
+  text-align: left;
+}
+
+.failed-hint span {
+  font-size: 1rem;
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.failed-hint p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--llm-muted);
+}
+
+/* ── Szczegóły techniczne ── */
+
+.failed-detail {
+  width: 100%;
+  border: 1px solid var(--llm-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--llm-surface);
+  text-align: left;
+}
+
+.failed-detail summary {
+  cursor: pointer;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--llm-muted);
+  list-style: none;
+}
+
+.failed-detail summary::-webkit-details-marker {
+  display: none;
+}
+
+.failed-detail code {
+  display: block;
+  padding: 0 14px 12px;
+  font-size: 0.78rem;
+  color: var(--llm-primary);
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+/* ── Przyciski ── */
+
+.failed-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.failed-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 50px;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    opacity 0.2s,
+    transform 0.15s;
+  border: none;
+}
+
+.failed-btn:active {
+  transform: scale(0.97);
+}
+
+.failed-btn-primary {
+  background: var(--llm-primary);
+  color: #fff;
+}
+
+.failed-btn-primary:hover {
+  opacity: 0.88;
+}
+
+.failed-btn-secondary {
+  background: var(--llm-surface);
+  color: var(--text);
+  border: 1px solid var(--llm-border);
+}
+
+.failed-btn-secondary:hover {
+  background: var(--llm-surface-2);
+}
+/* =====================
+   Doc type badge
+===================== */
+
+.doc-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--llm-border);
+  background: var(--llm-surface-2);
+  color: var(--llm-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* =====================
+   Section list (key_sections)
+===================== */
+
+.section-list {
+  display: grid;
+  gap: 10px;
+}
+
+.section-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--llm-border);
+  border-radius: 18px;
+  background: var(--llm-surface);
+}
+
+.section-tag {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--llm-surface-2);
+  color: var(--llm-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.section-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text);
+  padding-top: 3px;
+}
+
+/* =====================
+   Additional notes
+===================== */
+
+.notes-text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--llm-muted);
+}
+/* =====================
+   Section points (lista w paragrafie)
+===================== */
+
+.section-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--llm-border);
+  border-radius: 18px;
+  background: var(--llm-surface);
+}
+
+.section-points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.section-points li {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text);
+  padding-left: 12px;
+  position: relative;
+}
+
+.section-points li::before {
+  content: "–";
+  position: absolute;
+  left: 0;
+  color: var(--llm-muted);
+}
+
+/* =====================
+   Subsection label
+===================== */
+
+.subsection-label {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--llm-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* =====================
+   Clause list
+===================== */
+
+.clause-list {
+  display: grid;
+  gap: 8px;
+}
+
+.clause-item {
+  padding: 10px 14px;
+  border-left: 3px solid var(--llm-primary);
+  border-radius: 0 14px 14px 0;
+  background: rgba(79, 110, 247, 0.07);
+}
+
+.clause-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text);
+}

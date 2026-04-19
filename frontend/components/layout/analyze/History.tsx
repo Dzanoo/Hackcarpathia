@@ -4,6 +4,8 @@ import { useMemo, useState, useEffect } from "react";
 import Loader from "@/components/animations/loading";
 import { Clock3, FileText, Search } from "lucide-react";
 import ServiceScreen from "@/components/menus/ServiceScreen";
+import { useRouter } from "next/navigation";
+import Failed, { httpStatusToReason, FailReason } from "@/components/menus/Failed";
 
 type HistoryContent = {
   document_type: string;
@@ -48,19 +50,24 @@ export default function HistoryPage() {
   const [query, setQuery] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  const [error, setError] = useState<FailReason | null>(null);
 
   useEffect(() => {
     const load = async () => {
+      setError(null);
+
       try {
         const res = await fetch("http://172.16.16.13:8000/history");
+
+        if (!res.ok) throw { status: res.status };
+
         const data: ApiResponse = await res.json();
-
-        console.log(data);
-
         setHistory(Array.isArray(data?.history) ? data.history.map(normalizeHistoryItem) : []);
       } catch (err) {
-        console.error("History fetch error:", err);
-        setHistory([]);
+        const status = (err as { status?: number })?.status;
+        setError(httpStatusToReason(status ?? 0));
       } finally {
         setLoading(false);
       }
@@ -69,6 +76,23 @@ export default function HistoryPage() {
     load();
   }, []);
 
+  // w JSX, przed głównym returnem:
+  if (error)
+    return (
+      <Failed
+        reason={error}
+        onRetry={() => {
+          setError(null);
+          setLoading(true);
+        }}
+      />
+    );
+
+  const viewResult = (idx: number) => {
+    console.log(idx);
+    // router.replace(`/response/`);
+  };
+
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
 
@@ -76,7 +100,6 @@ export default function HistoryPage() {
       const title = (item.content.file_name ?? "").toLowerCase();
       const type = (item.content?.document_type ?? "").toLowerCase();
       const summary = (item.content?.summary ?? "").toLowerCase();
-      console.log(item);
 
       return title.includes(q) || type.includes(q) || summary.includes(q);
     });
@@ -100,7 +123,7 @@ export default function HistoryPage() {
 
         <div className="list-card">
           {filtered.map((item, idx) => (
-            <article className="list-item" key={idx}>
+            <article className="list-item" key={idx} onClick={() => viewResult(idx)}>
               <div className="list-item-icon">
                 <FileText size={18} />
               </div>

@@ -30,7 +30,7 @@ export default function Services() {
       <div className="servicesGroup">
         <p>Inne</p>
         <div className="servicesButtons">
-          <ServiceButton icon={<MessageSquareMore size={20} color="blue" />} label="Wsparcie" href="/other/support" badge={2} />
+          <ServiceButton icon={<MessageSquareMore size={20} color="blue" />} label="Wsparcie" href="/other/support" />
           <ServiceButton icon={<Settings size={20} color="blue" />} label="Ustawienia Profilu" href="/other/settings" />
           <ServiceButton icon={<HelpCircle size={20} color="blue" />} label="Pomoc" href="/other/help" />
         </div>
