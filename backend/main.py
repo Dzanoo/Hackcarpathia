@@ -109,11 +109,10 @@ class QueryRequest(BaseModel):
 
 @app.post("/analyze")
 async def analyze_document(
-    body: QueryRequest,
-    file: UploadFile = File(...)
+    session_id: str = Form(...),
+    message: str = Form(default=""),
+    file: UploadFile = File(...),
 ):
-    session_id = body.session_id
-    message = body.message if body.message else ""
     try:
         if not session_exists(session_id):
             raise HTTPException(404, f"Sesja '{session_id}' nie istnieje. Utwórz przez POST /session/new")
@@ -124,11 +123,11 @@ async def analyze_document(
 
         text = extract_text(file.filename, file_bytes)
 
-        v = "User Message:" + "" + "\n\nDocument to analyze:\n" + text
+        prompt = "Wiadomość Użytkownika:" + message + "\n\nDokument do analizy:\n" + text
 
         return await raw_query(
             session_id,
-            v
+            prompt
         )
 
     except Exception as e:
@@ -137,20 +136,15 @@ async def analyze_document(
 
 @app.post("/query")
 async def query(
-    body: QueryRequest
+    session_id: str = Form(...),
+    message: str = Form(...),
 ) -> dict[str, int | None]:
-    session_id = body.session_id
-    message = body.message if body.message else ""
-
     if not session_exists(session_id):
         raise HTTPException(404, f"Sesja '{session_id}' nie istnieje. Utwórz przez POST /session/new")
 
-    append_message(session_id, "user", message)
-    history = get_history(session_id)
-
     return await raw_query(
         session_id,
-        history
+        message
     )
 
 
