@@ -95,6 +95,34 @@ export default function RightsPage() {
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
+  // Funkcja filtrowania artykułów
+  const filterArticles = (articles: Array<{ name: string; desc: string }>) => {
+    if (!query.trim()) return articles;
+    const lowerQuery = query.toLowerCase();
+    return articles.filter(
+      (article) =>
+        article.name.toLowerCase().includes(lowerQuery) ||
+        article.desc.toLowerCase().includes(lowerQuery)
+    );
+  };
+
+  // Pobierz artykuły na podstawie zapytania
+  const getSearchResults = () => {
+    if (!query.trim()) return null;
+    
+    const results: { category: string; articles: Array<{ name: string; desc: string }> }[] = [];
+    Object.entries(CATEGORIES_DATA).forEach(([category, articles]) => {
+      const filtered = filterArticles(articles);
+      if (filtered.length > 0) {
+        results.push({ category, articles: filtered });
+      }
+    });
+    return results;
+  };
+
+  const searchResults = getSearchResults();
+  const currentArticles = selectedCategory ? filterArticles(CATEGORIES_DATA[selectedCategory]) : null;
+
   return (
     <ServiceScreen eyebrow="Samodzielność" title="Twoje prawa" description="Wyszukaj podstawowe informacje i sprawdź kategorie wsparcia.">
       <div className="service-form">
@@ -103,7 +131,7 @@ export default function RightsPage() {
           <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Szukaj prawa, tematu lub instytucji..." />
         </label>
 
-        {selectedCategory && (
+        {selectedCategory && !query.trim() && (
           <button 
             type="button" 
             className="back-button"
@@ -114,7 +142,21 @@ export default function RightsPage() {
           </button>
         )}
 
-        {!selectedCategory && (
+        {query.trim() && (
+          <button 
+            type="button" 
+            className="back-button"
+            onClick={() => {
+              setQuery("");
+              setSelectedCategory(null);
+            }}
+          >
+            <ArrowLeft size={18} />
+            <span>Wyczyść wyszukiwanie</span>
+          </button>
+        )}
+
+        {!selectedCategory && !query.trim() && (
           <div className="category-grid">
             {Object.keys(CATEGORIES_DATA).map((item) => (
               <button 
@@ -130,11 +172,36 @@ export default function RightsPage() {
           </div>
         )}
 
-        {selectedCategory && (
+        {query.trim() && searchResults && searchResults.length > 0 && (
+          <div className="search-results">
+            <h3>Wyniki wyszukiwania ({searchResults.reduce((sum, r) => sum + r.articles.length, 0)})</h3>
+            {searchResults.map((result) => (
+              <div key={result.category} className="category-data">
+                <h4 style={{ marginTop: "16px" }}>{result.category}</h4>
+                <div className="articles-list">
+                  {result.articles.map((article, idx) => (
+                    <div key={idx} className="article-card">
+                      <div className="article-name">{article.name}</div>
+                      <div className="article-desc">{article.desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {query.trim() && (!searchResults || searchResults.length === 0) && (
+          <div className="no-results">
+            <p>Brak wyników dla: "{query}"</p>
+          </div>
+        )}
+
+        {!query.trim() && selectedCategory && currentArticles && (
           <div className="category-data">
             <h3>{selectedCategory} - Artykuły</h3>
             <div className="articles-list">
-              {CATEGORIES_DATA[selectedCategory].map((article, idx) => (
+              {currentArticles.map((article, idx) => (
                 <div key={idx} className="article-card">
                   <div className="article-name">{article.name}</div>
                   <div className="article-desc">{article.desc}</div>
