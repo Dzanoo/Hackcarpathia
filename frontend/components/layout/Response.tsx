@@ -4,6 +4,7 @@ import Loader from "@/components/animations/loading";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FileText, ShieldCheck, Info, AlertTriangle, ShieldAlert, ListChecks } from "lucide-react";
+import Failed, { httpStatusToReason, FailReason } from "@/components/menus/Failed";
 
 type RiskLevel = "niskie" | "srednie" | "wysokie" | "nielegalne";
 
@@ -19,24 +20,13 @@ type ApiResponse = {
   session_id: string | null;
   extracted_text_length: number;
   result: {
+    file_name: string;
     document_type: string;
     summary: string;
     key_points: string[];
     risk_flags: RiskFlag[];
     overall_risk: RiskLevel;
   };
-};
-
-const MOCK: ApiResponse = {
-  session_id: null,
-  extracted_text_length: 119,
-  result: {
-    document_type: "faktura",
-    summary: "Faktura za usługę związaną ze ślubem Anny Kowalskiej, opiewająca na kwotę 12000 zł, oznaczona jako zapłacona.",
-    overall_risk: "niskie",
-    key_points: ["Kwota do zapłaty: 12000 zł", "Usługa dotyczy ślubu", "Faktura została opłacona", "Brak zaległości"],
-    risk_flags: [],
-  },
 };
 
 function riskLabel(level: RiskLevel) {
@@ -61,43 +51,49 @@ function riskIcon(level: RiskLevel) {
   }
 }
 
-const documentTypeLabels: Record<string, string> = {
-  umowa_o_prace: "Umowa o pracę",
-  umowa_zlecenie: "Umowa zlecenia",
-  umowa_o_dzielo: "Umowa o dzieło",
-  pismo_zus: "Pismo ZUS",
-  pismo_us: "Pismo US",
-  umowa_najmu: "Umowa najmu",
-  inne: "Inne",
-};
-
 function formatLabel(str: string) {
-  if (!str) return "";
-  return documentTypeLabels[str] ?? str.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return str && str.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export default function ResponsePage() {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ApiResponse | null>(null);
+  const [error, setError] = useState<FailReason | null>(null);
 
   useEffect(() => {
     if (!id) return;
 
     setLoading(true);
+    setError(null);
 
     fetch(`http://172.16.16.13:8000/result/${id}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw { status: res.status };
+        return res.json();
+      })
       .then((data) => {
         console.log(data);
         setData(data);
-        setLoading(false);
       })
-      .catch(() => {
-        setData(null);
+      .catch((err) => {
+        setError(httpStatusToReason(err?.status));
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, [id]);
+
+  if (error)
+    return (
+      <Failed
+        reason={error}
+        onRetry={() => {
+          setError(null);
+          setLoading(true);
+        }}
+      />
+    );
 
   if (loading || !data) {
     return (
@@ -114,11 +110,6 @@ export default function ResponsePage() {
       <section className="response-shell">
         {/* TOP */}
         <div className="response-topbar">
-          <div className="response-id">
-            <FileText size={16} />
-            <span>{formatLabel(result.document_type)}</span>
-          </div>
-
           <div className={`risk-badge ${result.overall_risk}`}>
             {riskIcon(result.overall_risk)}
             {riskLabel(result.overall_risk)}
@@ -127,25 +118,24 @@ export default function ResponsePage() {
 
         {/* HERO */}
         <section className="response-hero">
-          <h1>{formatLabel(result.document_type)}</h1>
+          <p className="response-eyebrow">{formatLabel(result.document_type)}</p>
+          <h1>{result.file_name ?? formatLabel(result.document_type)}</h1>
           <p className="response-summary">{result.summary}</p>
-
           <div className="response-kpis">
             <div className="response-kpi">
               <span>Poziom ryzyka</span>
-              <strong>{riskLabel(result.overall_risk) || "Brak ryzyka"}</strong>
+              <strong>{riskLabel(result.overall_risk)}</strong>
             </div>
           </div>
         </section>
 
         {/* KEY POINTS */}
-        {result.key_points && result.key_points?.length > 0 && (
+        {result.key_points && result.key_points.length > 0 && (
           <section className="response-section">
             <h2>
               <ListChecks size={18} />
               Kluczowe informacje
             </h2>
-
             <div className="pill-list">
               {result.key_points.map((p, i) => (
                 <span className="pill" key={i}>
@@ -168,14 +158,16 @@ export default function ResponsePage() {
           ) : (
             <div className="risk-list">
               {result.risk_flags.map((r, i) => (
-                <div className="risk-item" key={i}>
+                <div className={`risk-item ${r.level}`} key={i}>
                   <div className="risk-head">
-                    <span className={`risk-chip ${r.level}`}>{riskLabel(r.level)}</span>
+                    <span className={`risk-chip ${r.level}`}>
+                      {riskIcon(r.level)}
+                      {riskLabel(r.level)}
+                    </span>
+                    {r.legal_basis && <span className="risk-basis">{r.legal_basis}</span>}
                   </div>
-
-                  <p className="risk-fragment">„{r.fragment}”</p>
+                  <p className="risk-fragment">„{r.fragment}"</p>
                   <p className="risk-explanation">{r.explanation}</p>
-
                   <div className="risk-recommendation">
                     <strong>Rekomendacja</strong>
                     <p>{r.recommendation}</p>
