@@ -1557,9 +1557,9 @@ textarea {
   background: transparent;
 }
 
-.password-field:focus-within {
-  border-color: rgba(79, 110, 247, 0.65);
-  box-shadow: 0 0 0 4px rgba(79, 110, 247, 0.12);
+.password-field input:focus {
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .password-toggle {

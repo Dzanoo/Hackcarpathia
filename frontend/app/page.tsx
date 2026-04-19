@@ -1,31 +1,20 @@
 "use client";
 
-import { FormEvent, useState, useSyncExternalStore } from "react";
+import { FormEvent, useState } from "react";
 import { Eye, EyeOff, LockKeyhole } from "lucide-react";
+import { useAuth } from "@/components/auth/AuthProvider";
 import Services from "@/components/layout/Services";
-
-const APP_PASSWORD = "hackcarpathia";
-const AUTH_STORAGE_KEY = "hackcarpathia-authenticated";
 
 export default function Home() {
   const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState("");
-  const isClient = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
-  const hasStoredAccess =
-    isClient && window.localStorage.getItem(AUTH_STORAGE_KEY) === "true";
+  const { isAuthenticated, login } = useAuth();
 
   const handleLogin = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (password === APP_PASSWORD) {
-      window.localStorage.setItem(AUTH_STORAGE_KEY, "true");
-      setIsAuthenticated(true);
+    if (login(password)) {
       setError("");
       return;
     }
@@ -33,11 +22,7 @@ export default function Home() {
     setError("Nieprawidłowe hasło.");
   };
 
-  if (!isClient) {
-    return null;
-  }
-
-  if (isAuthenticated || hasStoredAccess) {
+  if (isAuthenticated) {
     return (
       <div id="MainPage" suppressHydrationWarning={true}>
         <Services />
