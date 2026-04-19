@@ -17,15 +17,15 @@ from sessions import (
     append_message,
     create_session,
     delete_session,
+    get_all_history,
     get_history,
     get_public_history,
     init_db,
     session_exists,
     get_db_new_id,
-    get_history_all,
+    get_topics,
     get_db_result
 )
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -45,8 +45,21 @@ class ChatRequest(BaseModel):
     session_id: str
     message: str
 
-
+haslo="tajnehaslo"
 # ── Endpoints ──────────────────────────────────────────────────────────────────
+
+@app.get("/login")
+async def login(pass_hash: str):
+    if pass_hash != "tajnehaslo":
+        raise HTTPException(401, "Nieprawidłowe hasło")
+    return {"logged_in": True}
+
+@app.get("/debug/prompt")
+async def debug_prompt():
+    from prompt_importer import load_sys_prompt
+    return {"prompt": load_sys_prompt()}
+
+
 @app.get("/")
 async def root():
     return {
@@ -103,9 +116,6 @@ async def raw_query(session_id: str, message: str) -> dict[str, int | None]:
     append_message(session_id, "assistant", raw_response)
     return {"id": get_db_new_id()}
 
-class QueryRequest(BaseModel):
-    session_id: str
-    message: str 
 
 @app.post("/analyze")
 async def analyze_document(
@@ -148,36 +158,15 @@ async def query(
     )
 
 
-
-@app.post("/chat")
-async def chat(req: ChatRequest):
-    """
-    Pytanie follow-up w ramach istniejącej sesji.
-    Np. po analizie dokumentu: "Co oznacza ten punkt?" albo "Czy mogą mi to zrobić?"
-    """
-    if not session_exists(req.session_id):
-        raise HTTPException(404, f"Sesja '{req.session_id}' nie istnieje. Utwórz przez POST /session/new")
-
-    append_message(req.session_id, "user", req.message)
-    history = get_history(req.session_id)
-
-    raw_response = await ask_ollama(history)
-    result = parse_llm_json(raw_response)
-
-    append_message(req.session_id, "assistant", raw_response)
-
-    return {
-        "session_id": req.session_id,
-        "result": result,
-        "history_length": len(get_public_history(req.session_id)),
-    }
-
-
-
 @app.get("/history")
 async def history():
     """Zwraca historię wiadomości sesji (bez system promptu)."""
-    return {"history": get_history_all()}
+    return {"history": get_topics()}
+
+@app.get("/history/{sessoin_id}")
+async def history(session_id: str):
+    """Zwraca historię wiadomości sesji (bez system promptu)."""
+    return {"history": get_all_history(session_id)}
 
 @app.get("/result/{id}")
 async def get_result(id: str):
@@ -195,13 +184,6 @@ async def remove_session(session_id: str):
         raise HTTPException(404, "Sesja nie istnieje")
     return {"deleted": session_id}
 
-@app.post("/ocr-test")
-async def ocr_test(file: UploadFile = File(...)):
-    file_bytes = await file.read()
-    text = extract_text(file.filename, file_bytes)
-    return {"text": text, "length": len(text)}
-
-
 @app.get("/prawa/{typ}")
 async def prawa(typ: str):
     with open("data/prawa.json", 'r') as f:
@@ -212,3 +194,12 @@ async def prawa(typ: str):
             return json_data[typ]
         else:
             raise HTTPException(404, "Nie ma takich praw")
+
+
+
+# test
+@app.post("/ocr-test")
+async def ocr_test(file: UploadFile = File(...)):
+    file_bytes = await file.read()
+    text = extract_text(file.filename, file_bytes)
+    return {"text": text, "length": len(text)}

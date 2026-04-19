@@ -32,6 +32,7 @@ def init_db() -> None:
             CREATE TABLE IF NOT EXISTS messages (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 session_id TEXT NOT NULL,
+                user_id TEXT,
                 role TEXT NOT NULL,
                 content TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -82,10 +83,31 @@ def get_history(session_id: str) -> list:
     return full_history
 
 
-def get_history_all() -> list:
+def get_topics() -> list:
     with _get_conn() as conn:
         rows = conn.execute(
-            "SELECT role, content, created_at, id FROM messages WHERE role = 'assistant' ORDER BY id",
+            "SELECT role, content, created_at, id FROM messages WHERE role = 'assistant' ORDER BY id"
+        ).fetchall()
+    
+    result = []
+    for r in rows:
+        try:
+            content = json.loads(r["content"])
+        except (json.JSONDecodeError, TypeError):
+            content = r["content"]
+        result.append({
+            "role": r["role"],
+            "content": content,
+            "created_at": r["created_at"],
+            "id": r["id"]
+        })
+    return result
+
+def get_all_history(session_id: str) -> list:
+    with _get_conn() as conn:
+        rows = conn.execute(
+            "SELECT role, content, created_at, id FROM messages WHERE session_id = ? ORDER BY id",
+            (session_id)
         ).fetchall()
     
     result = []
