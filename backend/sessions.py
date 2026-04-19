@@ -79,11 +79,6 @@ def get_history(session_id: str) -> list:
     messages = [{"role": r["role"], "content": r["content"]} for r in rows]
     full_history = [{"role": "system", "content": SYSTEM_PROMPT}] + messages
     
-    # print("\n" + "="*60)
-    # print("SYSTEM PROMPT SENT TO OLLAMA:")
-    # print(SYSTEM_PROMPT)
-    # print("="*60 + "\n")
-    
     return full_history
 
 
