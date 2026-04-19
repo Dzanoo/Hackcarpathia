@@ -22,6 +22,7 @@ type HistoryItem = {
   created_at?: string;
   status?: string;
   content: HistoryContent;
+  id: number;
 };
 
 type ApiResponse = {
@@ -88,9 +89,8 @@ export default function HistoryPage() {
       />
     );
 
-  const viewResult = (idx: number) => {
-    console.log(idx);
-    // router.replace(`/response/`);
+  const viewResult = (item: HistoryItem) => {
+    router.replace(`/response/${item.id}`);
   };
 
   const filtered = useMemo(() => {
@@ -123,7 +123,7 @@ export default function HistoryPage() {
 
         <div className="list-card">
           {filtered.map((item, idx) => (
-            <article className="list-item" key={idx} onClick={() => viewResult(idx)}>
+            <article className="list-item" key={idx} onClick={() => viewResult(item)}>
               <div className="list-item-icon">
                 <FileText size={18} />
               </div>
