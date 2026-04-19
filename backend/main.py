@@ -67,6 +67,10 @@ async def root():
         }
     }
 
+@app.get("/debug/prompt")
+async def debug_prompt():
+    from prompt_importer import load_sys_prompt
+    return {"prompt": load_sys_prompt()}
 
 @app.get("/health")
 async def health():

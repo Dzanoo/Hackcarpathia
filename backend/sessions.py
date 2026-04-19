@@ -71,14 +71,20 @@ def get_db_result(id: int) -> dict | None:
     return json.loads(row["content"]) if row else None
 
 def get_history(session_id: str) -> list:
-    """Returns full history with system prompt prepended in memory — not stored in DB."""
     with _get_conn() as conn:
         rows = conn.execute(
             "SELECT role, content FROM messages WHERE session_id = ? ORDER BY id",
             (session_id,)
         ).fetchall()
     messages = [{"role": r["role"], "content": r["content"]} for r in rows]
-    return [{"role": "system", "content": SYSTEM_PROMPT}] + messages
+    full_history = [{"role": "system", "content": SYSTEM_PROMPT}] + messages
+    
+    # print("\n" + "="*60)
+    # print("SYSTEM PROMPT SENT TO OLLAMA:")
+    # print(SYSTEM_PROMPT)
+    # print("="*60 + "\n")
+    
+    return full_history
 
 
 def get_history_all() -> list:
