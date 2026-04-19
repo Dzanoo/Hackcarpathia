@@ -35,7 +35,6 @@ SYSTEM_PROMPT = load_sys_prompt()
 async def lifespan(app: FastAPI):
     init_db()
     yield
-
 app = FastAPI(title="mPrzyszłość", version="1.0.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
@@ -48,11 +47,6 @@ class ChatRequest(BaseModel):
 
 
 # ── Endpoints ──────────────────────────────────────────────────────────────────
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    init_db()
-    yield
-
 @app.get("/")
 async def root():
     return {
@@ -74,19 +68,13 @@ async def health():
     ollama = await check_ollama_health()
     return {"status": "ok" if ollama["status"] == "ok" else "degraded", "ollama": ollama}
 
-@app.post("/session/new")
-async def new_session():
-    """Tworzy nową sesję czatu z pustą historią."""
-    session_id = create_session()
-    logger.info(f"Nowa sesja: {session_id}")
-    return {"session_id": session_id}
-
 @app.get("/session/new")
 async def new_session():
     """Tworzy nową sesję czatu z pustą historią."""
     session_id = create_session()
     logger.info(f"Nowa sesja: {session_id}")
     return {"session_id": session_id}
+
 
 
 @app.get("/session/{session_id}/history")
@@ -99,32 +87,63 @@ async def get_session(session_id: str):
         "messages": get_public_history(session_id),
     }
 
-@app.post("/analyze")
-async def analyze_document(
-    session_id: str = Form(...),
-    file: UploadFile = File(...),  # now required, no Optional
-):
-    if not session_exists(session_id):
-        raise HTTPException(404, f"Sesja '{session_id}' nie istnieje. Utwórz przez POST /session/new")
 
-    file_bytes = await file.read()
-    if len(file_bytes) > 10 * 1024 * 1024:
-        raise HTTPException(400, "Plik za duży (max 10 MB)")
-
-    text = extract_text(file.filename, file_bytes)
-    user_content = "Plik do analizy:\r\n" + text
-
-    append_message(session_id, "user", user_content)
+async def raw_query(session_id: str, message: str) -> dict[str, int | None]:
+    # Don't re-check session here if callers already validated it
+    append_message(session_id, "user", message)
     history = get_history(session_id)
 
     raw_response = await ask_ollama(history)
-    result = parse_llm_json(raw_response)
+    # parse_llm_json(raw_response)
 
     append_message(session_id, "assistant", raw_response)
-    new_id = get_db_new_id()
-    return {
-        "id": new_id
-    }
+    return {"id": get_db_new_id()}
+
+class QueryRequest(BaseModel):
+    session_id: str
+    message: str 
+
+@app.post("/analyze")
+async def analyze_document(
+    session_id = Form(...),
+    message = Form(...),
+    file: UploadFile = File(...)
+):
+    try:
+        if not session_exists(session_id):
+            raise HTTPException(404, f"Sesja '{session_id}' nie istnieje. Utwórz przez POST /session/new")
+
+        file_bytes = await file.read()
+        if len(file_bytes) > 10 * 1024 * 1024:
+            raise HTTPException(400, "Plik za duży (max 10 MB)")
+
+        text = extract_text(file.filename, file_bytes)
+
+        v = "User Message:" + "" + "\n\nDocument to analyze:\n" + text
+
+        return await raw_query(
+            session_id,
+            v
+        )
+
+    except Exception as e:
+        raise HTTPException(500, "Server Error: " + str(e))
+
+
+@app.post("/query")
+async def query(
+    session_id: str = Form(...),
+    message: str = Form(...),
+) -> dict[str, int | None]:
+    if not session_exists(session_id):
+        raise HTTPException(404, f"Sesja '{session_id}' nie istnieje. Utwórz przez POST /session/new")
+
+    return await raw_query(
+        session_id,
+        message
+    )
+
+
 
 @app.post("/chat")
 async def chat(req: ChatRequest):
@@ -150,12 +169,6 @@ async def chat(req: ChatRequest):
     }
 
 
-@app.get("/session/{session_id}/history")
-async def history(session_id: str):
-    """Zwraca historię wiadomości sesji (bez system promptu)."""
-    if not session_exists(session_id):
-        raise HTTPException(404, "Sesja nie istnieje")
-    return {"session_id": session_id, "messages": get_public_history(session_id)}
 
 @app.get("/history")
 async def history():
@@ -191,7 +204,7 @@ async def prawa(typ: str):
         text = f.read()
 
         json_data = json.loads(text)
-        if json_data.has_key(typ):
+        if typ in json_data:
             return json_data[typ]
         else:
             raise HTTPException(404, "Nie ma takich praw")
